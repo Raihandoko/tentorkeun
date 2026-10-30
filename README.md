@@ -7,17 +7,13 @@ Platform digital untuk mencocokkan siswa dengan tentor yang tepat menggunakan AI
 ### 1. Install Dependencies
 
 ```bash
-npm install prisma @prisma/client bcrypt @types/bcrypt next-auth@beta tsx
+npm install
 ```
 
 ### 2. Setup Database
 
 ```bash
-# Push schema ke database (SQLite)
-npx prisma db push
-
-# Seed data (16 tentor + admin + demo users)
-npm run db:seed
+node scripts/setup-db.js
 ```
 
 ### 3. Jalankan Development Server
@@ -101,7 +97,7 @@ Buka [http://localhost:3000](http://localhost:3000)
 ## Tech Stack
 
 - **Framework**: Next.js 16 App Router + React 19
-- **Database**: Prisma + SQLite (gampang migrasi ke Postgres)
+- **Database**: better-sqlite3 (SQLite)
 - **Auth**: NextAuth v5 (beta)
 - **Styling**: Tailwind CSS 4
 - **AI**: OpenAI-compatible API (Gemini/OpenAI/Groq)
@@ -124,9 +120,7 @@ Buka [http://localhost:3000](http://localhost:3000)
 ```bash
 npm run dev          # Development server
 npm run build        # Production build
-npm run db:push      # Push schema ke DB
-npm run db:seed      # Seed demo data
-npm run db:studio    # Prisma Studio GUI
+npm run db:setup     # Setup database + seed data
 ```
 
 ## Environment Variables
