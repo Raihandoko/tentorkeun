@@ -9,9 +9,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const tutorProfile = await db.tutor.findUnique({
-      where: { userId: session.user.id },
-    });
+    const tutorProfile = db.prepare("SELECT * FROM tutors WHERE userId = ?").get(session.user.id) as any;
 
     if (!tutorProfile) {
       return NextResponse.json({ error: "Tutor profile not found" }, { status: 404 });
@@ -23,25 +21,31 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Data tidak lengkap" }, { status: 400 });
     }
 
-    const booking = await db.booking.findUnique({
-      where: { id: bookingId },
-      include: { student: true },
-    });
+    const booking = db.prepare("SELECT * FROM bookings WHERE id = ?").get(bookingId) as any;
 
     if (!booking || booking.tutorId !== tutorProfile.id) {
       return NextResponse.json({ error: "Booking not found" }, { status: 404 });
     }
 
-    const session_record = await db.session.create({
-      data: {
-        bookingId,
-        tutorId: tutorProfile.id,
-        studentId: booking.studentId,
-        tanggal: new Date(tanggal),
-        durasi: parseInt(durasi),
-        catatan: catatan || "",
-      },
-    });
+    const sessionId = `s${Date.now()}`;
+    
+    db.prepare(`
+      INSERT INTO sessions (id, bookingId, tutorId, studentId, tanggal, durasi, catatan, createdAt)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      sessionId,
+      bookingId,
+      tutorProfile.id,
+      booking.studentId,
+      new Date(tanggal).toISOString(),
+      parseInt(durasi),
+      catatan || "",
+      new Date().toISOString()
+    );
+
+    db.prepare("UPDATE bookings SET status = ? WHERE id = ?").run("completed", bookingId);
+
+    const session_record = db.prepare("SELECT * FROM sessions WHERE id = ?").get(sessionId);
 
     return NextResponse.json(session_record);
   } catch (error) {

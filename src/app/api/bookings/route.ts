@@ -15,30 +15,33 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Data tidak lengkap" }, { status: 400 });
     }
 
-    const booking = await db.booking.create({
-      data: {
-        studentId: session.user.id,
-        tutorId,
-        mapel,
-        jenjang,
-        sessionType: sessionType || "online",
-        tanggal: new Date(tanggal),
-        durasi: parseInt(durasi),
-        harga: parseInt(harga),
-        kebutuhan: kebutuhan || "",
-        status: "pending",
-      },
-    });
+    const bookingId = `b${Date.now()}`;
+    
+    db.prepare(`
+      INSERT INTO bookings (id, studentId, tutorId, mapel, jenjang, sessionType, tanggal, durasi, harga, kebutuhan, status, createdAt)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      bookingId,
+      session.user.id,
+      tutorId,
+      mapel,
+      jenjang,
+      sessionType || "online",
+      new Date(tanggal).toISOString(),
+      parseInt(durasi),
+      parseInt(harga),
+      kebutuhan || "",
+      "pending",
+      new Date().toISOString()
+    );
 
-    // Create pending payment
-    await db.payment.create({
-      data: {
-        bookingId: booking.id,
-        amount: parseInt(harga),
-        method: "transfer",
-        status: "pending",
-      },
-    });
+    const paymentId = `p${Date.now()}`;
+    db.prepare(`
+      INSERT INTO payments (id, bookingId, amount, method, status, createdAt)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).run(paymentId, bookingId, parseInt(harga), "transfer", "pending", new Date().toISOString());
+
+    const booking = db.prepare("SELECT * FROM bookings WHERE id = ?").get(bookingId);
 
     return NextResponse.json(booking);
   } catch (error) {
@@ -54,24 +57,51 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    let where = {};
+    let bookings;
     if (session.user.role === "student") {
-      where = { studentId: session.user.id };
+      bookings = db.prepare(`
+        SELECT b.*, 
+               u.nama as studentNama, u.email as studentEmail,
+               t.nama as tutorNama, t.gelar as tutorGelar,
+               p.amount as paymentAmount, p.status as paymentStatus
+        FROM bookings b
+        LEFT JOIN users u ON b.studentId = u.id
+        LEFT JOIN tutors t ON b.tutorId = t.id
+        LEFT JOIN payments p ON b.id = p.bookingId
+        WHERE b.studentId = ?
+        ORDER BY b.createdAt DESC
+      `).all(session.user.id);
     } else if (session.user.role === "tutor") {
-      const tutor = await db.tutor.findUnique({ where: { userId: session.user.id } });
-      if (tutor) where = { tutorId: tutor.id };
+      const tutor = db.prepare("SELECT * FROM tutors WHERE userId = ?").get(session.user.id) as any;
+      if (tutor) {
+        bookings = db.prepare(`
+          SELECT b.*, 
+                 u.nama as studentNama, u.email as studentEmail,
+                 t.nama as tutorNama, t.gelar as tutorGelar,
+                 p.amount as paymentAmount, p.status as paymentStatus
+          FROM bookings b
+          LEFT JOIN users u ON b.studentId = u.id
+          LEFT JOIN tutors t ON b.tutorId = t.id
+          LEFT JOIN payments p ON b.id = p.bookingId
+          WHERE b.tutorId = ?
+          ORDER BY b.createdAt DESC
+        `).all(tutor.id);
+      } else {
+        bookings = [];
+      }
+    } else {
+      bookings = db.prepare(`
+        SELECT b.*, 
+               u.nama as studentNama, u.email as studentEmail,
+               t.nama as tutorNama, t.gelar as tutorGelar,
+               p.amount as paymentAmount, p.status as paymentStatus
+        FROM bookings b
+        LEFT JOIN users u ON b.studentId = u.id
+        LEFT JOIN tutors t ON b.tutorId = t.id
+        LEFT JOIN payments p ON b.id = p.bookingId
+        ORDER BY b.createdAt DESC
+      `).all();
     }
-
-    const bookings = await db.booking.findMany({
-      where,
-      include: {
-        student: true,
-        tutor: true,
-        payment: true,
-        sessions: true,
-      },
-      orderBy: { createdAt: "desc" },
-    });
 
     return NextResponse.json(bookings);
   } catch (error) {

@@ -15,29 +15,21 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Data tidak valid" }, { status: 400 });
     }
 
-    const review = await db.review.create({
-      data: {
-        tutorId,
-        studentId: session.user.id,
-        rating: parseInt(rating),
-        komentar: komentar || "",
-      },
-    });
+    const reviewId = `r${Date.now()}`;
+    
+    db.prepare(`
+      INSERT INTO reviews (id, tutorId, studentId, rating, komentar, createdAt)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).run(reviewId, tutorId, session.user.id, parseInt(rating), komentar || "", new Date().toISOString());
 
-    // Update tutor rating
-    const reviews = await db.review.findMany({
-      where: { tutorId },
-    });
-
+    const reviews = db.prepare("SELECT * FROM reviews WHERE tutorId = ?").all(tutorId) as any[];
     const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
 
-    await db.tutor.update({
-      where: { id: tutorId },
-      data: {
-        rating: Math.round(avgRating * 10) / 10,
-        ulasanCount: reviews.length,
-      },
-    });
+    db.prepare(`
+      UPDATE tutors SET rating = ?, ulasanCount = ? WHERE id = ?
+    `).run(Math.round(avgRating * 10) / 10, reviews.length, tutorId);
+
+    const review = db.prepare("SELECT * FROM reviews WHERE id = ?").get(reviewId);
 
     return NextResponse.json(review);
   } catch (error) {

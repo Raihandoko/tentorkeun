@@ -5,17 +5,16 @@ import { NextResponse } from "next/server";
 
 export async function POST(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
   if (!session || session.user.role !== "admin") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  await db.tutor.update({
-    where: { id: params.id },
-    data: { status: "rejected" },
-  });
+  const { id } = await params;
+
+  db.prepare("UPDATE tutors SET status = ? WHERE id = ?").run("rejected", id);
 
   redirect("/admin/tutors");
 }
