@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, LogOut, User } from "lucide-react";
 import { Container } from "@/components/ui";
 import { Logo } from "@/components/logo";
+import { auth } from "@/lib/auth";
 
 const nav = [
   { href: "/", label: "Beranda" },
@@ -16,7 +17,9 @@ const fitur = [
   { href: "/aksesibilitas", label: "Aksesibilitas", desc: "Mode untuk siswa ABK & TTS" },
 ];
 
-export function SiteHeader() {
+export async function SiteHeader() {
+  const session = await auth();
+
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur">
       <Container className="flex h-16 items-center justify-between gap-4">
@@ -54,19 +57,43 @@ export function SiteHeader() {
             </div>
           </details>
 
-          <Link
-            href="/auth/login"
-            className="ml-1 rounded-md border border-ink/25 px-4 py-2.5 text-sm font-semibold text-ink transition hover:border-ink/50"
-          >
-            Login
-          </Link>
-          
-          <Link
-            href="/ajukan"
-            className="ml-1 hidden rounded-md bg-accent px-4 py-2.5 text-sm font-semibold text-accent-ink transition hover:opacity-90 sm:inline-flex"
-          >
-            Mulai Cari
-          </Link>
+          {session ? (
+            <>
+              <Link
+                href="/dashboard"
+                className="ml-1 flex items-center gap-1.5 rounded-md border border-ink/25 px-3 py-2 text-sm font-semibold text-ink transition hover:border-ink/50"
+              >
+                <User size={14} aria-hidden />
+                Dashboard
+              </Link>
+              
+              <form action="/api/auth/signout" method="POST">
+                <button
+                  type="submit"
+                  className="ml-1 flex items-center gap-1.5 rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-red-700"
+                >
+                  <LogOut size={14} aria-hidden />
+                  Keluar
+                </button>
+              </form>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/auth/login"
+                className="ml-1 rounded-md border border-ink/25 px-4 py-2.5 text-sm font-semibold text-ink transition hover:border-ink/50"
+              >
+                Login
+              </Link>
+              
+              <Link
+                href="/ajukan"
+                className="ml-1 hidden rounded-md bg-accent px-4 py-2.5 text-sm font-semibold text-accent-ink transition hover:opacity-90 sm:inline-flex"
+              >
+                Mulai Cari
+              </Link>
+            </>
+          )}
         </nav>
       </Container>
     </header>
