@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, Info, Loader2, Sparkles } from "lucide-react";
+import { ArrowRight, Info, Loader2, Sparkles, Volume2 } from "lucide-react";
 import type { MatchResponse } from "@/lib/ai";
 import { TutorCard } from "@/components/tutor-card";
 import { Alert, buttonClass, Textarea } from "@/components/ui";
@@ -20,11 +20,14 @@ export function MatchForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [hasil, setHasil] = useState<MatchResponse | null>(null);
+  const [speaking, setSpeaking] = useState(false);
+  const [paused, setPaused] = useState(false);
 
   async function submit() {
     setError("");
     setLoading(true);
     setHasil(null);
+    stopSpeech();
     try {
       const res = await fetch("/api/match", {
         method: "POST",
@@ -38,6 +41,64 @@ export function MatchForm() {
       setError(e instanceof Error ? e.message : "Terjadi kesalahan.");
     } finally {
       setLoading(false);
+    }
+  }
+
+  function speakSummary() {
+    if (!hasil || !window.speechSynthesis) return;
+
+    stopSpeech();
+
+    let text = `Ringkasan hasil pencarian. ${hasil.ringkasan}. `;
+    text += `Ditemukan ${hasil.hasil.length} tentor yang cocok. `;
+    
+    hasil.hasil.forEach((m, i) => {
+      text += `Nomor ${i + 1}. ${m.tutor.nama}. Skor kecocokan ${m.skor} dari 100. `;
+      text += `Alasan: ${m.alasan.join(". ")}. `;
+    });
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "id-ID";
+    utterance.rate = 0.9;
+    utterance.pitch = 1;
+
+    utterance.onstart = () => {
+      setSpeaking(true);
+      setPaused(false);
+    };
+
+    utterance.onend = () => {
+      setSpeaking(false);
+      setPaused(false);
+    };
+
+    utterance.onerror = () => {
+      setSpeaking(false);
+      setPaused(false);
+    };
+
+    window.speechSynthesis.speak(utterance);
+  }
+
+  function pauseSpeech() {
+    if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+      window.speechSynthesis.pause();
+      setPaused(true);
+    }
+  }
+
+  function resumeSpeech() {
+    if (window.speechSynthesis.paused) {
+      window.speechSynthesis.resume();
+      setPaused(false);
+    }
+  }
+
+  function stopSpeech() {
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+      setSpeaking(false);
+      setPaused(false);
     }
   }
 
@@ -122,6 +183,32 @@ export function MatchForm() {
                 {hasil.ringkasan}
               </span>
             </span>
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            {!speaking ? (
+              <button onClick={speakSummary} className={buttonClass("secondary")}>
+                <Volume2 size={16} aria-hidden />
+                Bacakan hasil pencarian
+              </button>
+            ) : (
+              <>
+                {paused ? (
+                  <button onClick={resumeSpeech} className={buttonClass("secondary")}>
+                    <Volume2 size={16} aria-hidden />
+                    Lanjutkan
+                  </button>
+                ) : (
+                  <button onClick={pauseSpeech} className={buttonClass("secondary")}>
+                    <Volume2 size={16} aria-hidden />
+                    Jeda
+                  </button>
+                )}
+                <button onClick={stopSpeech} className={buttonClass("secondary")}>
+                  Berhenti
+                </button>
+              </>
+            )}
           </div>
 
           <p className="mt-4 flex items-center gap-1.5 text-xs text-muted">
