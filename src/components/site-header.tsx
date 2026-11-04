@@ -1,13 +1,9 @@
-"use client";
-
 import Link from "next/link";
 import { ChevronDown, LogOut, User } from "lucide-react";
 import { Container } from "@/components/ui";
 import { Logo } from "@/components/logo";
 import { auth } from "@/lib/auth";
-import { signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { SignOutButton } from "./sign-out-button";
 
 const nav = [
   { href: "/", label: "Beranda" },
@@ -24,14 +20,6 @@ const fitur = [
 
 export async function SiteHeader() {
   const session = await auth();
-  
-  return (
-    <HeaderContent session={session} />
-  );
-}
-
-function HeaderContent({ session }: { session: any }) {
-  const router = useRouter();
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur">
@@ -80,17 +68,7 @@ function HeaderContent({ session }: { session: any }) {
                 Dashboard
               </Link>
               
-              <button
-                onClick={async () => {
-                  await signOut({ redirect: false });
-                  router.push("/");
-                  router.refresh();
-                }}
-                className="ml-1 flex items-center gap-1.5 rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-red-700"
-              >
-                <LogOut size={14} aria-hidden />
-                Keluar
-              </button>
+              <SignOutButton />
             </>
           ) : (
             <>
