@@ -33,11 +33,14 @@ export function AccessPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [hasil, setHasil] = useState<SimplifyResponse | null>(null);
+  const [speaking, setSpeaking] = useState(false);
+  const [paused, setPaused] = useState(false);
 
   async function simplify() {
     setError("");
     setLoading(true);
     setHasil(null);
+    stopSpeech();
     try {
       const res = await fetch("/api/simplify", {
         method: "POST",
@@ -51,6 +54,60 @@ export function AccessPage() {
       setError(e instanceof Error ? e.message : "Terjadi kesalahan.");
     } finally {
       setLoading(false);
+    }
+  }
+
+  function speakText(text: string) {
+    if (!window.speechSynthesis) {
+      setError("Browser tidak mendukung text-to-speech");
+      return;
+    }
+
+    stopSpeech();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "id-ID";
+    utterance.rate = 0.9;
+    utterance.pitch = 1;
+
+    utterance.onstart = () => {
+      setSpeaking(true);
+      setPaused(false);
+    };
+
+    utterance.onend = () => {
+      setSpeaking(false);
+      setPaused(false);
+    };
+
+    utterance.onerror = () => {
+      setSpeaking(false);
+      setPaused(false);
+      setError("Gagal membaca teks");
+    };
+
+    window.speechSynthesis.speak(utterance);
+  }
+
+  function pauseSpeech() {
+    if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+      window.speechSynthesis.pause();
+      setPaused(true);
+    }
+  }
+
+  function resumeSpeech() {
+    if (window.speechSynthesis.paused) {
+      window.speechSynthesis.resume();
+      setPaused(false);
+    }
+  }
+
+  function stopSpeech() {
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+      setSpeaking(false);
+      setPaused(false);
     }
   }
 
@@ -100,6 +157,36 @@ export function AccessPage() {
               <pre className="whitespace-pre-wrap rounded-md border border-line bg-card p-4 font-sans text-[15px] leading-loose text-ink">
                 {hasil.teks}
               </pre>
+              
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                {!speaking ? (
+                  <button
+                    onClick={() => speakText(hasil.teks)}
+                    className={buttonClass("primary")}
+                  >
+                    <Volume2 size={16} aria-hidden />
+                    Bacakan hasil
+                  </button>
+                ) : (
+                  <>
+                    {paused ? (
+                      <button onClick={resumeSpeech} className={buttonClass("primary")}>
+                        <Volume2 size={16} aria-hidden />
+                        Lanjutkan
+                      </button>
+                    ) : (
+                      <button onClick={pauseSpeech} className={buttonClass("secondary")}>
+                        <Volume2 size={16} aria-hidden />
+                        Jeda
+                      </button>
+                    )}
+                    <button onClick={stopSpeech} className={buttonClass("secondary")}>
+                      Berhenti
+                    </button>
+                  </>
+                )}
+              </div>
+
               <p className="mt-3 flex items-start gap-2 rounded-md border border-accent/30 bg-accent-soft p-3 text-[13px] text-accent">
                 <Megaphone size={14} className="mt-0.5 shrink-0" aria-hidden />
                 {hasil.catatan + (hasil.via === "mock" ? " (mode demo)" : "")}
