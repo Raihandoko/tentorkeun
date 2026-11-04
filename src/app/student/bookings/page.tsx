@@ -53,7 +53,7 @@ export default async function StudentBookingsPage() {
                     <h3 className="font-serif text-lg font-semibold text-ink">{b.tutor_nama}</h3>
                     <p className="text-sm text-muted">{b.tutor_gelar}</p>
                     <p className="text-sm text-muted mt-2">
-                      {b.mapel} • {b.jenjang} • {b.sessionType}
+                      {b.mapel} • {b.jenjang} • {b.session_type}
                     </p>
                     <p className="text-sm text-muted">
                       {new Date(b.tanggal).toLocaleDateString("id-ID", { 
@@ -62,6 +62,10 @@ export default async function StudentBookingsPage() {
                         month: "long", 
                         year: "numeric" 
                       })} • {b.durasi} menit
+                    </p>
+                    <p className="text-sm font-semibold text-accent mt-1">Rp {format.rupiah(b.harga)}</p>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
