@@ -8,9 +8,7 @@ export default async function TutorBookingsPage() {
   const session = await auth();
   if (!session || session.user.role !== "tutor") redirect("/");
 
-  const tutorProfile = await db.tutor.findUnique({
-    where: { userId: session.user.id },
-  });
+  const tutorProfile = db.prepare("SELECT * FROM tutors WHERE user_id = ?").get(session.user.id) as any;
 
   if (!tutorProfile) {
     return (
@@ -22,14 +20,13 @@ export default async function TutorBookingsPage() {
     );
   }
 
-  const bookings = await db.booking.findMany({
-    where: { tutorId: tutorProfile.id },
-    include: {
-      student: true,
-      sessions: true,
-    },
-    orderBy: { tanggal: "desc" },
-  });
+  const bookings = db.prepare(`
+    SELECT b.*, u.name as student_name
+    FROM bookings b
+    LEFT JOIN users u ON b.student_id = u.id
+    WHERE b.tutor_id = ?
+    ORDER BY b.tanggal DESC
+  `).all(tutorProfile.id) as any[];
 
   return (
     <section className="py-12">
@@ -55,14 +52,14 @@ export default async function TutorBookingsPage() {
                         {b.status}
                       </span>
                     </div>
-                    <h3 className="font-semibold text-ink">{b.student.name}</h3>
+                    <h3 className="font-semibold text-ink">{b.student_name}</h3>
                     <p className="text-sm text-muted">{b.mapel} • {b.jenjang}</p>
                     <p className="text-sm text-muted">
                       {new Date(b.tanggal).toLocaleDateString("id-ID", { 
                         weekday: "long", 
                         day: "numeric", 
                         month: "long" 
-                      })} • {b.durasi} menit • {b.sessionType}
+                      })} • {b.durasi} menit • {b.session_type}
                     </p>
                     {b.kebutuhan && (
                       <p className="text-sm text-muted mt-2 italic">"{b.kebutuhan}"</p>
