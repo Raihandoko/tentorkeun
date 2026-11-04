@@ -7,22 +7,14 @@ export default async function StudentReportsPage() {
   const session = await auth();
   if (!session || session.user.role !== "student") redirect("/");
 
-  const reports = await db.report.findMany({
-    where: {
-      session: {
-        studentId: session.user.id,
-      },
-    },
-    include: {
-      session: {
-        include: {
-          tutor: true,
-          booking: true,
-        },
-      },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const reports = db.prepare(`
+    SELECT r.*, s.tutor_id, t.nama as tutor_nama
+    FROM reports r
+    LEFT JOIN sessions s ON r.session_id = s.id
+    LEFT JOIN tutors t ON s.tutor_id = t.id
+    WHERE s.student_id = ?
+    ORDER BY r.created_at DESC
+  `).all(session.user.id) as any[];
 
   return (
     <section className="py-12">
@@ -39,7 +31,7 @@ export default async function StudentReportsPage() {
                 <div className="mb-4">
                   <h3 className="font-serif text-xl font-semibold text-ink">{r.judul}</h3>
                   <p className="text-sm text-muted">
-                    {r.session.tutor.nama} • {new Date(r.session.tanggal).toLocaleDateString("id-ID")}
+                    {r.tutor_nama} • {new Date(r.created_at).toLocaleDateString("id-ID")}
                   </p>
                 </div>
 
