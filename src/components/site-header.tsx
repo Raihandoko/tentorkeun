@@ -68,6 +68,7 @@ export async function SiteHeader() {
               </Link>
               
               <form action="/api/auth/signout" method="POST">
+                <input type="hidden" name="callbackUrl" value="/" />
                 <button
                   type="submit"
                   className="ml-1 flex items-center gap-1.5 rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-red-700"
