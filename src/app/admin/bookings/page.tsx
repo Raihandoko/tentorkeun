@@ -8,14 +8,17 @@ export default async function AdminBookingsPage() {
   const session = await auth();
   if (!session || session.user.role !== "admin") redirect("/");
 
-  const bookings = await db.booking.findMany({
-    include: {
-      student: true,
-      tutor: true,
-      payment: true,
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const bookings = db.prepare(`
+    SELECT b.*, 
+           s.name as student_name,
+           t.nama as tutor_nama,
+           p.status as payment_status
+    FROM bookings b
+    LEFT JOIN users s ON b.student_id = s.id
+    LEFT JOIN tutors t ON b.tutor_id = t.id
+    LEFT JOIN payments p ON b.id = p.booking_id
+    ORDER BY b.created_at DESC
+  `).all() as any[];
 
   return (
     <section className="py-12">
@@ -40,18 +43,18 @@ export default async function AdminBookingsPage() {
                       }`}>
                         {b.status}
                       </span>
-                      {b.payment && (
+                      {b.payment_status && (
                         <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                          b.payment.status === "paid" ? "bg-green-100 text-green-700" :
-                          b.payment.status === "failed" ? "bg-red-100 text-red-700" :
+                          b.payment_status === "paid" ? "bg-green-100 text-green-700" :
+                          b.payment_status === "failed" ? "bg-red-100 text-red-700" :
                           "bg-gray-100 text-gray-700"
                         }`}>
-                          {b.payment.status}
+                          {b.payment_status}
                         </span>
                       )}
                     </div>
-                    <p className="font-semibold text-ink">{b.student.name} → {b.tutor.nama}</p>
-                    <p className="text-sm text-muted">{b.mapel} • {b.jenjang} • {b.sessionType}</p>
+                    <p className="font-semibold text-ink">{b.student_name} → {b.tutor_nama}</p>
+                    <p className="text-sm text-muted">{b.mapel} • {b.jenjang} • {b.session_type}</p>
                     <p className="text-sm text-muted">Tanggal: {new Date(b.tanggal).toLocaleDateString("id-ID")} • {b.durasi} menit</p>
                     <p className="text-sm font-semibold text-accent mt-1">Rp {format.rupiah(b.harga)}</p>
                   </div>

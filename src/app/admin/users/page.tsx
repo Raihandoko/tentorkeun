@@ -7,9 +7,7 @@ export default async function AdminUsersPage() {
   const session = await auth();
   if (!session || session.user.role !== "admin") redirect("/");
 
-  const users = await db.user.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  const users = db.prepare("SELECT * FROM users ORDER BY created_at DESC").all() as any[];
 
   const students = users.filter((u) => u.role === "student");
   const tutors = users.filter((u) => u.role === "tutor");
