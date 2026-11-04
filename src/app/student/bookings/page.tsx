@@ -4,6 +4,7 @@ import { Container } from "@/components/ui";
 import { db } from "@/lib/db";
 import { format } from "@/lib/format";
 import Link from "next/link";
+import { ReviewForm } from "@/components/review-form";
 
 export default async function StudentBookingsPage() {
   const session = await auth();
@@ -66,6 +67,17 @@ export default async function StudentBookingsPage() {
                     <p className="text-sm font-semibold text-accent mt-1">Rp {format.rupiah(b.harga)}</p>
                   </div>
                 </div>
+                
+                {b.status === "completed" && (
+                  <details className="mt-4">
+                    <summary className="cursor-pointer text-sm font-semibold text-accent hover:underline">
+                      Beri Ulasan
+                    </summary>
+                    <div className="mt-4">
+                      <ReviewForm tutorId={b.tutor_id} tutorNama={b.tutor_nama} bookingId={b.id} />
+                    </div>
+                  </details>
+                )}
               </div>
             ))}
           </div>
