@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, Info, Loader2, Sparkles, Volume2 } from "lucide-react";
+import { ArrowRight, Info, Loader2, Mic, MicOff, Sparkles, Volume2 } from "lucide-react";
 import type { MatchResponse } from "@/lib/ai";
 import { TutorCard } from "@/components/tutor-card";
 import { Alert, buttonClass, Textarea } from "@/components/ui";
@@ -22,6 +22,7 @@ export function MatchForm() {
   const [hasil, setHasil] = useState<MatchResponse | null>(null);
   const [speaking, setSpeaking] = useState(false);
   const [paused, setPaused] = useState(false);
+  const [listening, setListening] = useState(false);
 
   async function submit() {
     setError("");
@@ -102,6 +103,45 @@ export function MatchForm() {
     }
   }
 
+  function startListening() {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      setError("Browser tidak mendukung speech recognition");
+      return;
+    }
+
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+
+    recognition.lang = 'id-ID';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onstart = () => {
+      setListening(true);
+      setError("");
+    };
+
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      setTeks(transcript);
+    };
+
+    recognition.onerror = () => {
+      setListening(false);
+      setError("Gagal mendengar suara. Coba lagi.");
+    };
+
+    recognition.onend = () => {
+      setListening(false);
+    };
+
+    recognition.start();
+  }
+
+  function stopListening() {
+    setListening(false);
+  }
+
   return (
     <div>
       <form
@@ -114,14 +154,28 @@ export function MatchForm() {
         <label htmlFor="kebutuhan" className="mb-2 block text-sm font-semibold text-ink">
           Ceritakan kebutuhan belajarnya
         </label>
-        <Textarea
-          id="kebutuhan"
-          rows={5}
-          value={teks}
-          onChange={(e) => setTeks(e.target.value)}
-          placeholder="Contoh: “Cari tentor matematika SMP untuk anak saya, online, budget maksimal 200 ribu, sabar …”"
-          className="text-[15px]"
-        />
+        <div className="relative">
+          <Textarea
+            id="kebutuhan"
+            rows={5}
+            value={teks}
+            onChange={(e) => setTeks(e.target.value)}
+            placeholder="Contoh: "Cari tentor matematika SMP untuk anak saya, online, budget maksimal 200 ribu, sabar …""
+            className="text-[15px]"
+          />
+          <button
+            type="button"
+            onClick={listening ? stopListening : startListening}
+            className={`absolute bottom-3 right-3 rounded-full p-2 transition ${
+              listening 
+                ? "bg-red-600 text-white animate-pulse" 
+                : "bg-accent text-accent-ink hover:opacity-90"
+            }`}
+            title={listening ? "Sedang mendengar..." : "Bicara untuk input"}
+          >
+            {listening ? <MicOff size={16} aria-hidden /> : <Mic size={16} aria-hidden />}
+          </button>
+        </div>
 
         <div className="mt-4 flex flex-wrap gap-2">
           <span className="flex items-center gap-1 text-xs text-muted">
