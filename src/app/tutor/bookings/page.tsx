@@ -74,7 +74,7 @@ export default async function TutorBookingsPage() {
                     </Link>
                   )}
                 </div>
-                {b.sessions.length > 0 && (
+                {b.sessions && b.sessions.length > 0 && (
                   <div className="mt-4 pt-4 border-t border-line">
                     <p className="text-xs text-muted">Sesi selesai: {b.sessions.length}</p>
                   </div>
