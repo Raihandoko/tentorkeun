@@ -18,15 +18,15 @@ export async function POST(req: Request) {
     const reviewId = `r${Date.now()}`;
     
     db.prepare(`
-      INSERT INTO reviews (id, tutorId, studentId, rating, komentar, createdAt)
+      INSERT INTO reviews (id, tutor_id, student_id, rating, komentar, created_at)
       VALUES (?, ?, ?, ?, ?, ?)
     `).run(reviewId, tutorId, session.user.id, parseInt(rating), komentar || "", new Date().toISOString());
 
-    const reviews = db.prepare("SELECT * FROM reviews WHERE tutorId = ?").all(tutorId) as any[];
+    const reviews = db.prepare("SELECT * FROM reviews WHERE tutor_id = ?").all(tutorId) as any[];
     const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
 
     db.prepare(`
-      UPDATE tutors SET rating = ?, ulasanCount = ? WHERE id = ?
+      UPDATE tutors SET rating = ?, ulasan_count = ? WHERE id = ?
     `).run(Math.round(avgRating * 10) / 10, reviews.length, tutorId);
 
     const review = db.prepare("SELECT * FROM reviews WHERE id = ?").get(reviewId);

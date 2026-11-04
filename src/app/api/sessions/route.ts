@@ -9,7 +9,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const tutorProfile = db.prepare("SELECT * FROM tutors WHERE userId = ?").get(session.user.id) as any;
+    const tutorProfile = db.prepare("SELECT * FROM tutors WHERE user_id = ?").get(session.user.id) as any;
 
     if (!tutorProfile) {
       return NextResponse.json({ error: "Tutor profile not found" }, { status: 404 });
@@ -23,20 +23,20 @@ export async function POST(req: Request) {
 
     const booking = db.prepare("SELECT * FROM bookings WHERE id = ?").get(bookingId) as any;
 
-    if (!booking || booking.tutorId !== tutorProfile.id) {
+    if (!booking || booking.tutor_id !== tutorProfile.id) {
       return NextResponse.json({ error: "Booking not found" }, { status: 404 });
     }
 
     const sessionId = `s${Date.now()}`;
     
     db.prepare(`
-      INSERT INTO sessions (id, bookingId, tutorId, studentId, tanggal, durasi, catatan, createdAt)
+      INSERT INTO sessions (id, booking_id, tutor_id, student_id, tanggal, durasi, catatan, created_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       sessionId,
       bookingId,
       tutorProfile.id,
-      booking.studentId,
+      booking.student_id,
       new Date(tanggal).toISOString(),
       parseInt(durasi),
       catatan || "",

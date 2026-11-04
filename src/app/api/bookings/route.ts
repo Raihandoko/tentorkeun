@@ -18,7 +18,7 @@ export async function POST(req: Request) {
     const bookingId = `b${Date.now()}`;
     
     db.prepare(`
-      INSERT INTO bookings (id, studentId, tutorId, mapel, jenjang, sessionType, tanggal, durasi, harga, kebutuhan, status, createdAt)
+      INSERT INTO bookings (id, student_id, tutor_id, mapel, jenjang, session_type, tanggal, durasi, harga, kebutuhan, status, created_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       bookingId,
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
 
     const paymentId = `p${Date.now()}`;
     db.prepare(`
-      INSERT INTO payments (id, bookingId, amount, method, status, createdAt)
+      INSERT INTO payments (id, booking_id, amount, method, status, created_at)
       VALUES (?, ?, ?, ?, ?, ?)
     `).run(paymentId, bookingId, parseInt(harga), "transfer", "pending", new Date().toISOString());
 
@@ -61,30 +61,30 @@ export async function GET(req: Request) {
     if (session.user.role === "student") {
       bookings = db.prepare(`
         SELECT b.*, 
-               u.nama as studentNama, u.email as studentEmail,
+               u.name as studentNama, u.email as studentEmail,
                t.nama as tutorNama, t.gelar as tutorGelar,
                p.amount as paymentAmount, p.status as paymentStatus
         FROM bookings b
-        LEFT JOIN users u ON b.studentId = u.id
-        LEFT JOIN tutors t ON b.tutorId = t.id
-        LEFT JOIN payments p ON b.id = p.bookingId
-        WHERE b.studentId = ?
-        ORDER BY b.createdAt DESC
+        LEFT JOIN users u ON b.student_id = u.id
+        LEFT JOIN tutors t ON b.tutor_id = t.id
+        LEFT JOIN payments p ON b.id = p.booking_id
+        WHERE b.student_id = ?
+        ORDER BY b.created_at DESC
       `).all(session.user.id);
     } else if (session.user.role === "tutor") {
-      const tutor = db.prepare("SELECT * FROM tutors WHERE userId = ?").get(session.user.id) as any;
+      const tutor = db.prepare("SELECT * FROM tutors WHERE user_id = ?").get(session.user.id) as any;
       if (tutor) {
         bookings = db.prepare(`
           SELECT b.*, 
-                 u.nama as studentNama, u.email as studentEmail,
+                 u.name as studentNama, u.email as studentEmail,
                  t.nama as tutorNama, t.gelar as tutorGelar,
                  p.amount as paymentAmount, p.status as paymentStatus
           FROM bookings b
-          LEFT JOIN users u ON b.studentId = u.id
-          LEFT JOIN tutors t ON b.tutorId = t.id
-          LEFT JOIN payments p ON b.id = p.bookingId
-          WHERE b.tutorId = ?
-          ORDER BY b.createdAt DESC
+          LEFT JOIN users u ON b.student_id = u.id
+          LEFT JOIN tutors t ON b.tutor_id = t.id
+          LEFT JOIN payments p ON b.id = p.booking_id
+          WHERE b.tutor_id = ?
+          ORDER BY b.created_at DESC
         `).all(tutor.id);
       } else {
         bookings = [];
@@ -92,14 +92,14 @@ export async function GET(req: Request) {
     } else {
       bookings = db.prepare(`
         SELECT b.*, 
-               u.nama as studentNama, u.email as studentEmail,
+               u.name as studentNama, u.email as studentEmail,
                t.nama as tutorNama, t.gelar as tutorGelar,
                p.amount as paymentAmount, p.status as paymentStatus
         FROM bookings b
-        LEFT JOIN users u ON b.studentId = u.id
-        LEFT JOIN tutors t ON b.tutorId = t.id
-        LEFT JOIN payments p ON b.id = p.bookingId
-        ORDER BY b.createdAt DESC
+        LEFT JOIN users u ON b.student_id = u.id
+        LEFT JOIN tutors t ON b.tutor_id = t.id
+        LEFT JOIN payments p ON b.id = p.booking_id
+        ORDER BY b.created_at DESC
       `).all();
     }
 
