@@ -144,12 +144,6 @@ export default async function DashboardPage() {
             </div>
           </>
         )}
-
-        <div className="mt-8 pt-8 border-t border-line">
-          <Link href="/api/auth/signout" className="text-sm text-red-600 hover:underline">
-            Keluar
-          </Link>
-        </div>
       </Container>
     </section>
   );
