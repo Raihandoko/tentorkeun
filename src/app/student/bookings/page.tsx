@@ -9,19 +9,17 @@ export default async function StudentBookingsPage() {
   const session = await auth();
   if (!session || session.user.role !== "student") redirect("/");
 
-  const bookings = await db.booking.findMany({
-    where: { studentId: session.user.id },
-    include: {
-      tutor: true,
-      payment: true,
-      sessions: {
-        include: {
-          report: true,
-        },
-      },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const bookings = db.prepare(`
+    SELECT b.*, 
+           t.nama as tutor_nama,
+           t.gelar as tutor_gelar,
+           p.status as payment_status
+    FROM bookings b
+    LEFT JOIN tutors t ON b.tutor_id = t.id
+    LEFT JOIN payments p ON b.id = p.booking_id
+    WHERE b.student_id = ?
+    ORDER BY b.created_at DESC
+  `).all(session.user.id) as any[];
 
   return (
     <section className="py-12">
@@ -52,8 +50,8 @@ export default async function StudentBookingsPage() {
                         {b.status}
                       </span>
                     </div>
-                    <h3 className="font-serif text-lg font-semibold text-ink">{b.tutor.nama}</h3>
-                    <p className="text-sm text-muted">{b.tutor.gelar}</p>
+                    <h3 className="font-serif text-lg font-semibold text-ink">{b.tutor_nama}</h3>
+                    <p className="text-sm text-muted">{b.tutor_gelar}</p>
                     <p className="text-sm text-muted mt-2">
                       {b.mapel} • {b.jenjang} • {b.sessionType}
                     </p>
@@ -64,24 +62,6 @@ export default async function StudentBookingsPage() {
                         month: "long", 
                         year: "numeric" 
                       })} • {b.durasi} menit
-                    </p>
-                    <p className="text-sm font-semibold text-accent mt-2">Rp {format.rupiah(b.harga)}</p>
-                  </div>
-                </div>
-
-                {b.sessions.length > 0 && (
-                  <div className="mt-4 pt-4 border-t border-line">
-                    <p className="text-sm font-semibold text-ink mb-2">Sesi Selesai: {b.sessions.length}</p>
-                    {b.sessions.filter(s => s.report).length > 0 && (
-                      <Link 
-                        href={`/student/reports?bookingId=${b.id}`}
-                        className="text-sm text-accent hover:underline"
-                      >
-                        Lihat Laporan Progress →
-                      </Link>
-                    )}
-                  </div>
-                )}
               </div>
             ))}
           </div>
