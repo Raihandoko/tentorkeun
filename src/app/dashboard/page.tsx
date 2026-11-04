@@ -10,30 +10,23 @@ export default async function DashboardPage() {
 
   const { user } = session;
 
-  // Get stats based on role
   let stats: any = {};
   
   if (user.role === "admin") {
-    const [tutorsPending, totalBookings, totalUsers] = await Promise.all([
-      db.tutor.count({ where: { status: "pending" } }),
-      db.booking.count(),
-      db.user.count(),
-    ]);
-    stats = { tutorsPending, totalBookings, totalUsers };
+    const tutorsPending = db.prepare("SELECT COUNT(*) as count FROM tutors WHERE status = ?").get("pending") as any;
+    const totalBookings = db.prepare("SELECT COUNT(*) as count FROM bookings").get() as any;
+    const totalUsers = db.prepare("SELECT COUNT(*) as count FROM users").get() as any;
+    stats = { tutorsPending: tutorsPending.count, totalBookings: totalBookings.count, totalUsers: totalUsers.count };
   } else if (user.role === "student") {
-    const [myBookings, completedSessions] = await Promise.all([
-      db.booking.count({ where: { studentId: user.id } }),
-      db.session.count({ where: { studentId: user.id } }),
-    ]);
-    stats = { myBookings, completedSessions };
+    const myBookings = db.prepare("SELECT COUNT(*) as count FROM bookings WHERE student_id = ?").get(user.id) as any;
+    const completedSessions = db.prepare("SELECT COUNT(*) as count FROM sessions WHERE student_id = ?").get(user.id) as any;
+    stats = { myBookings: myBookings.count, completedSessions: completedSessions.count };
   } else if (user.role === "tutor") {
-    const tutorProfile = await db.tutor.findUnique({ where: { userId: user.id } });
+    const tutorProfile = db.prepare("SELECT * FROM tutors WHERE user_id = ?").get(user.id) as any;
     if (tutorProfile) {
-      const [myBookings, mySessions] = await Promise.all([
-        db.booking.count({ where: { tutorId: tutorProfile.id } }),
-        db.session.count({ where: { tutorId: tutorProfile.id } }),
-      ]);
-      stats = { myBookings, mySessions, status: tutorProfile.status };
+      const myBookings = db.prepare("SELECT COUNT(*) as count FROM bookings WHERE tutor_id = ?").get(tutorProfile.id) as any;
+      const mySessions = db.prepare("SELECT COUNT(*) as count FROM sessions WHERE tutor_id = ?").get(tutorProfile.id) as any;
+      stats = { myBookings: myBookings.count, mySessions: mySessions.count, status: tutorProfile.status };
     }
   }
 
