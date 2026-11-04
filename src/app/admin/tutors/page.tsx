@@ -7,10 +7,7 @@ export default async function AdminTutorsPage() {
   const session = await auth();
   if (!session || session.user.role !== "admin") redirect("/");
 
-  const tutors = await db.tutor.findMany({
-    include: { user: true },
-    orderBy: { createdAt: "desc" },
-  });
+  const tutors = db.prepare("SELECT * FROM tutors ORDER BY created_at DESC").all() as any[];
 
   const pending = tutors.filter((t) => t.status === "pending");
   const approved = tutors.filter((t) => t.status === "approved");
@@ -35,8 +32,7 @@ export default async function AdminTutorsPage() {
                       <div className="flex-1">
                         <h3 className="font-semibold text-ink">{t.nama}</h3>
                         <p className="text-sm text-muted">{t.gelar}</p>
-                        <p className="text-sm text-muted mt-1">{t.user.email}</p>
-                        <p className="text-sm text-muted">{t.kota} • {t.pengalamanTahun} tahun pengalaman</p>
+                        <p className="text-sm text-muted mt-1">{t.kota} • {t.pengalaman_tahun} tahun pengalaman</p>
                       </div>
                       <div className="flex gap-2">
                         <form action={`/api/admin/tutors/${t.id}/approve`} method="POST">
