@@ -6,6 +6,8 @@ import { tutores } from "@/lib/data/tutors";
 import { formatHarga } from "@/lib/format";
 import { initials } from "@/components/tutor-card";
 import { Badge, Card, Container } from "@/components/ui";
+import { auth } from "@/lib/auth";
+import { BookingForm } from "@/components/booking-form";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +22,9 @@ export default async function TutorDetailPage({ params }: { params: Promise<{ id
   const { id } = await params;
   const tutor = tutores.find((t) => t.id === id);
   if (!tutor) notFound();
+
+  const session = await auth();
+  const isStudent = session?.user.role === "student";
 
   const teksPrefill = encodeURIComponent(
     `Saya sedang mencari tentor ${tutor.mapel[0]} untuk jenjang ${tutor.jenjang[0]}, seperti profil ${tutor.nama} yang ada di katalog TentorKeun.`,
@@ -95,18 +100,40 @@ export default async function TutorDetailPage({ params }: { params: Promise<{ id
               ))}
             </div>
 
-            <Link
-              href={`/ajukan?teks=${teksPrefill}`}
-              className="mt-6 block w-full rounded-md bg-accent px-4 py-3 text-center text-sm font-semibold text-accent-ink transition hover:opacity-90"
-            >
-              Pesan sesi uji coba
-            </Link>
-            <Link
-              href={`/ajukan`}
-              className="mt-2 block w-full rounded-md border border-ink/25 px-4 py-3 text-center text-sm font-semibold text-ink transition hover:border-ink/50"
-            >
-              Cocokkan kebutuhan lain dengan AI
-            </Link>
+            {isStudent ? (
+              <div className="mt-6">
+                <details className="group">
+                  <summary className="block w-full cursor-pointer rounded-md bg-accent px-4 py-3 text-center text-sm font-semibold text-accent-ink transition hover:opacity-90">
+                    Pesan Sesi Sekarang
+                  </summary>
+                  <div className="mt-4 rounded-md border border-line bg-paper p-4">
+                    <BookingForm
+                      tutorId={tutor.id}
+                      tutorNama={tutor.nama}
+                      tutorMapel={tutor.mapel}
+                      tutorJenjang={tutor.jenjang}
+                      tutorHarga={tutor.hargaPerSesi}
+                      tutorSesi={tutor.sesiTersedia}
+                    />
+                  </div>
+                </details>
+              </div>
+            ) : (
+              <>
+                <Link
+                  href={session ? `/ajukan?teks=${teksPrefill}` : "/auth/login"}
+                  className="mt-6 block w-full rounded-md bg-accent px-4 py-3 text-center text-sm font-semibold text-accent-ink transition hover:opacity-90"
+                >
+                  {session ? "Pesan sesi uji coba" : "Login untuk pesan"}
+                </Link>
+                <Link
+                  href={`/ajukan`}
+                  className="mt-2 block w-full rounded-md border border-ink/25 px-4 py-3 text-center text-sm font-semibold text-ink transition hover:border-ink/50"
+                >
+                  Cocokkan kebutuhan lain dengan AI
+                </Link>
+              </>
+            )}
 
             <p className="mt-4 rounded-md border border-line bg-paper p-3 text-xs leading-relaxed text-muted">
               Tentor ini sudah lolos verifikasi dokumen TentorKeun. Kecocokan final tetap
