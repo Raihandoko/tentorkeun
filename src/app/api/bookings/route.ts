@@ -57,7 +57,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    let bookings;
+    let bookings: unknown[];
     if (session.user.role === "student") {
       bookings = db.prepare(`
         SELECT b.*, 

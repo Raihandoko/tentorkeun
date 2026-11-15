@@ -1,10 +1,23 @@
 "use client";
 
-import { useState } from "react";
-import { ArrowRight, Info, Loader2, Mic, MicOff, Sparkles, Volume2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowRight, Info, Mic, MicOff, Volume2 } from "lucide-react";
 import type { MatchResponse } from "@/lib/ai";
-import { TutorCard } from "@/components/tutor-card";
+import { TutorCard, TutorCardSkeleton } from "@/components/tutor-card";
+import { Inview } from "@/components/motion";
 import { Alert, buttonClass, Textarea } from "@/components/ui";
+
+type SpeechResultEvent = { results: ArrayLike<ArrayLike<{ transcript: string }>> };
+type SpeechRecognitionCtor = new () => {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  onstart: (() => void) | null;
+  onresult: ((e: SpeechResultEvent) => void) | null;
+  onerror: (() => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+};
 
 const contoh = [
   "Cari tentor matematika untuk anak saya kelas 9 SMP di Bandung. Sesi online, anggaran maksimal Rp200 ribu. Lebih suka tentor perempuan, bisa hari Sabtu. Anak agak kesulitan aljabar dan butuh yang sabar.",
@@ -13,7 +26,14 @@ const contoh = [
   "Butuh tentor fisika dan matematika untuk SMA, target UTBK. Bisa online, harga sekitar 200 ribu, lebih baik tentor laki-laki.",
 ];
 
+const loadingCopy = [
+  "Membaca kebutuhan belajarmu...",
+  "Mencari jadwal yang cocok...",
+  "Menghitung kecocokan tentor...",
+];
+
 export function MatchForm() {
+  const [copyIdx, setCopyIdx] = useState(0);
   const [teks, setTeks] = useState(
     () => (typeof window === "undefined" ? "" : new URLSearchParams(window.location.search).get("teks") ?? ""),
   );
@@ -24,8 +44,15 @@ export function MatchForm() {
   const [paused, setPaused] = useState(false);
   const [listening, setListening] = useState(false);
 
+  useEffect(() => {
+    if (!loading) return;
+    const t = setInterval(() => setCopyIdx((i) => (i + 1) % loadingCopy.length), 1800);
+    return () => clearInterval(t);
+  }, [loading]);
+
   async function submit() {
     setError("");
+    setCopyIdx(0);
     setLoading(true);
     setHasil(null);
     stopSpeech();
@@ -109,7 +136,9 @@ export function MatchForm() {
       return;
     }
 
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const w = window as unknown as { SpeechRecognition?: SpeechRecognitionCtor; webkitSpeechRecognition?: SpeechRecognitionCtor };
+    const SpeechRecognition = w.SpeechRecognition || w.webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
     const recognition = new SpeechRecognition();
 
     recognition.lang = 'id-ID';
@@ -121,7 +150,7 @@ export function MatchForm() {
       setError("");
     };
 
-    recognition.onresult = (event: any) => {
+    recognition.onresult = (event: SpeechResultEvent) => {
       const transcript = event.results[0][0].transcript;
       setTeks(transcript);
     };
@@ -149,7 +178,7 @@ export function MatchForm() {
           e.preventDefault();
           void submit();
         }}
-        className="rounded-lg border border-line bg-card p-6 sm:p-8"
+        className="rounded-xl border border-line bg-card p-6 sm:p-8"
       >
         <label htmlFor="kebutuhan" className="mb-2 block text-sm font-semibold text-ink">
           Ceritakan kebutuhan belajarnya
@@ -160,33 +189,30 @@ export function MatchForm() {
             rows={5}
             value={teks}
             onChange={(e) => setTeks(e.target.value)}
-            placeholder='Contoh: "Cari tentor matematika SMP untuk anak saya, online, budget maksimal 200 ribu, sabar …"'
+            placeholder="Contoh: cari tentor matematika SMP untuk anak saya, online, budget maksimal 200 ribu, yang sabar."
             className="text-[15px]"
           />
           <button
             type="button"
             onClick={listening ? stopListening : startListening}
-            className={`absolute bottom-3 right-3 rounded-full p-2 transition ${
-              listening 
-                ? "bg-red-600 text-white animate-pulse" 
-                : "bg-accent text-accent-ink hover:opacity-90"
+            className={`btn-press absolute bottom-3 right-3 rounded-full p-2 ${
+              listening ? "bg-koreksi text-koreksi-ink" : "bg-accent text-accent-ink hover:bg-accent-hover"
             }`}
-            title={listening ? "Sedang mendengar..." : "Bicara untuk input"}
+            aria-label={listening ? "Berhenti merekam" : "Bicara untuk mengisi"}
+            title={listening ? "Sedang mendengar..." : "Bicara untuk mengisi"}
           >
             {listening ? <MicOff size={16} aria-hidden /> : <Mic size={16} aria-hidden />}
           </button>
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2">
-          <span className="flex items-center gap-1 text-xs text-muted">
-            <Sparkles size={12} aria-hidden /> Coba salah satu:
-          </span>
+          <span className="flex items-center text-xs text-muted">Coba salah satu:</span>
           {contoh.map((c) => (
             <button
               key={c.slice(0, 12)}
               type="button"
               onClick={() => setTeks(c)}
-              className="rounded-full border border-line bg-paper px-3 py-1 text-xs text-muted transition hover:border-accent hover:text-accent"
+              className="btn-press rounded-full border border-line bg-paper px-3 py-1.5 text-xs text-muted hover:border-accent hover:text-accent"
             >
               Contoh {contoh.indexOf(c) + 1}
             </button>
@@ -196,23 +222,29 @@ export function MatchForm() {
         <div className="mt-6 flex items-center gap-3">
           <button type="submit" disabled={loading || teks.trim().length < 10} className={buttonClass("primary")}>
             {loading ? (
-              <>
-                <Loader2 size={16} className="animate-spin" aria-hidden /> Menganalisis…
-              </>
+              <>Mencari...</>
             ) : (
               <>
-                Cocokkan Saya <ArrowRight size={16} aria-hidden />
+                Cari tentor <ArrowRight size={16} className="arrow-nudge" aria-hidden />
               </>
             )}
           </button>
-          <p className="text-xs text-muted">
-            Analisis natural language → ranking tentor + alasan kecocokan, bukan sekadar filter.
-          </p>
+          <p className="text-xs text-muted">Tiap hasil disertai alasan kenapa tentor itu cocok.</p>
         </div>
         {teks.trim().length < 10 && (
-          <p className="mt-2 text-xs text-muted">Tulis minimal satu kalimat utuh untuk hasil yang berarti.</p>
+          <p className="mt-2 text-xs text-muted">Tulis satu kalimat utuh dulu ya, supaya hasilnya pas.</p>
         )}
       </form>
+
+      {loading && (
+        <div className="mt-10" aria-live="polite">
+          <p className="text-sm font-semibold text-ink">{loadingCopy[copyIdx]}</p>
+          <div className="mt-4 grid gap-5 lg:grid-cols-2">
+            <TutorCardSkeleton />
+            <TutorCardSkeleton />
+          </div>
+        </div>
+      )}
 
       {error && (
         <div className="mt-5">
@@ -223,17 +255,17 @@ export function MatchForm() {
       {hasil && (
         <div className="mt-10">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="font-serif text-2xl font-semibold text-ink">Tentor yang paling cocok</h2>
+            <h2 className="text-2xl font-semibold text-ink">Tentor yang paling cocok</h2>
             <span className="text-xs text-muted">
-              {hasil.via === "llm" ? "Hasil dari model bahasa (LLM)" : "Mode demo tanpa API key — hasil disimulasikan lokal"}
+              {hasil.via === "llm" ? "Hasil dari model bahasa" : "Mode demo tanpa API key, hasil disimulasikan di perangkat"}
             </span>
           </div>
 
-          <div className="mt-4 rounded-md border border-accent/30 bg-accent-soft p-4 text-sm leading-relaxed text-accent">
+          <div className="mt-4 rounded-xl border-l-4 border-accent bg-accent-soft p-4 text-sm leading-relaxed text-accent">
             <span className="flex items-start gap-2">
               <Info size={16} className="mt-0.5 shrink-0" aria-hidden />
               <span>
-                <strong className="font-semibold">Ringkasan AI: </strong>
+                <strong className="font-semibold">Ringkasan: </strong>
                 {hasil.ringkasan}
               </span>
             </span>
@@ -266,16 +298,14 @@ export function MatchForm() {
           </div>
 
           <p className="mt-4 flex items-center gap-1.5 text-xs text-muted">
-            <span className="font-mono text-[11px]">— dibaca dari permintaan: {hasil.dibaca}</span>
+            <span>Yang kami tangkap dari ceritamu: {hasil.dibaca}</span>
           </p>
 
           <div className="mt-6 grid gap-5 lg:grid-cols-2">
-            {hasil.hasil.map((m) => (
-              <TutorCard
-                key={m.tutor.id}
-                tutor={m.tutor}
-                skor={{ value: m.skor, label: m.label, alasan: m.alasan }}
-              />
+            {hasil.hasil.map((m, i) => (
+              <Inview key={m.tutor.id} index={i} y={24}>
+                <TutorCard tutor={m.tutor} skor={{ value: m.skor, label: m.label, alasan: m.alasan }} />
+              </Inview>
             ))}
           </div>
         </div>

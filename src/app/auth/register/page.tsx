@@ -44,7 +44,7 @@ export default function RegisterPage() {
       <Container>
         <div className="max-w-md mx-auto">
           <div className="text-center mb-8">
-            <h1 className="font-serif text-3xl font-semibold text-ink">Daftar ke TentorKeun</h1>
+            <h1 className="font-display text-3xl font-semibold text-ink">Daftar ke TentorKeun</h1>
             <p className="mt-2 text-sm text-muted">
               Sudah punya akun?{" "}
               <Link href="/auth/login" className="text-accent font-semibold hover:underline">
@@ -53,7 +53,7 @@ export default function RegisterPage() {
             </p>
           </div>
 
-          <div className="bg-card border border-line rounded-lg p-8">
+          <div className="bg-card border border-line rounded-xl p-8">
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label htmlFor="name" className="block text-sm font-semibold text-ink mb-1.5">
@@ -126,7 +126,7 @@ export default function RegisterPage() {
               </div>
 
               {error && (
-                <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md p-3">
+                <div className="text-sm text-koreksi bg-koreksi-soft border-l-4 border-koreksi rounded-xl p-3">
                   {error}
                 </div>
               )}

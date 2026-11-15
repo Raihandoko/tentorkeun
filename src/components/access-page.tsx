@@ -8,9 +8,9 @@ import type { SimplifyResponse } from "@/lib/ai";
 
 const MODES = [
   { id: "disleksia", nama: "Disleksia", warna: "accent", desc: "Kalimat pendek, bullet, kata umum yang mudah dipindai." },
-  { id: "tunanetra", nama: "Tunanetra", warna: "amber", desc: "Struktur rapi berlapis, ramah dibaca screen reader." },
-  { id: "tunarungu", nama: "Tunarungu", warna: "rust", desc: "Satu ide per poin, penanda visual, minim ketergantungan audio." },
-  { id: "ADHD", nama: "ADHD / fokus", warna: "rust", desc: "Pecah jadi langkah pendek dengan subjudul, minim distraksi." },
+  { id: "tunanetra", nama: "Tunanetra", warna: "peringatan", desc: "Struktur rapi berlapis, ramah dibaca screen reader." },
+  { id: "tunarungu", nama: "Tunarungu", warna: "koreksi", desc: "Satu ide per poin, penanda visual, minim ketergantungan audio." },
+  { id: "ADHD", nama: "ADHD / fokus", warna: "koreksi", desc: "Pecah jadi langkah pendek dengan subjudul, minim distraksi." },
   { id: "autisme", nama: "Autisme", warna: "accent", desc: "Instruksi literal, urut, tanpa kiasan atau makna ganda." },
 ] as const;
 
@@ -121,7 +121,7 @@ export function AccessPage() {
             type="button"
             onClick={() => setMode(m.id)}
             aria-pressed={mode === m.id}
-            className={`rounded-lg border p-4 text-left transition ${
+            className={`rounded-xl border p-4 text-left transition ${
               mode === m.id ? "border-accent bg-accent-soft" : "border-line bg-card hover:border-ink/25"
             }`}
           >
@@ -134,7 +134,7 @@ export function AccessPage() {
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
-        <div className="rounded-lg border border-line bg-card p-6">
+        <div className="rounded-xl border border-line bg-card p-6">
           <p className="mb-2 text-sm font-semibold text-ink">Materi asli</p>
           <Textarea rows={7} value={teks} onChange={(e) => setTeks(e.target.value)} className="text-[15px] leading-relaxed" />
           <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -148,7 +148,7 @@ export function AccessPage() {
           {error && <div className="mt-4"><Alert tone="error">{error}</Alert></div>}
         </div>
 
-        <div className="rounded-lg border border-line bg-paper p-6">
+        <div className="rounded-xl border border-line bg-paper p-6">
           <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-ink">
             <AudioLines size={15} className="text-accent" aria-hidden /> Hasil penyederhanaan
           </p>
@@ -206,10 +206,10 @@ export function AccessPage() {
       </div>
 
       <p className="mt-10 rounded-md border border-line bg-card p-5 text-sm leading-relaxed text-muted">
-        <strong className="text-ink">Catatan kunci bentuk luas:</strong> TentorKeun memagari seluruh pengalaman — pencarian
-        dapat disaring hanya ke tentor bersertifikasi ABK, materi bisa disederhanakan per kebutuhan, pembacaan layar (TTS)
-        tersedia di semua halaman lewat tombol “Aksesibilitas”, dan sesi daring menyediakan live caption seperti demo di atas.
-        Font ramah disleksia & kontras tinggi aktif via toolbar global di kanan bawah.
+        <strong className="text-ink">Catatan:</strong> Seluruh pengalaman di TentorKeun dibuat bisa dipakai semua orang. Pencarian
+        bisa disaring hanya ke tentor bersertifikasi ABK, materi bisa disederhanakan sesuai kebutuhan, bacaan suara
+        tersedia di semua halaman lewat tombol &ldquo;Aksesibilitas&rdquo;, dan sesi daring punya caption langsung seperti demo di atas.
+        Font ramah disleksia, kontras tinggi, dan kurangi animasi bisa dinyalakan dari tombol di kanan bawah.
       </p>
     </div>
   );
@@ -234,38 +234,38 @@ function CaptionDemo() {
   const progress = ((idx + 1) / SCRIPT_CAPTION.length) * 100;
 
   return (
-    <div className="overflow-hidden rounded-lg border border-line bg-[#12110d]">
-      <div className="flex items-center justify-between border-b border-white/10 px-5 py-3">
-        <p className="flex items-center gap-2 text-sm font-medium text-white/90">
-          <span className="h-2 w-2 rounded-full bg-[#e4572e] animate-pulse" aria-hidden />
-          Demo: Sesi daring langsung — Matematika (SMP)
+    <div className="overflow-hidden rounded-xl border border-line bg-ink">
+      <div className="flex items-center justify-between border-b border-paper/20 px-5 py-3">
+        <p className="flex items-center gap-2 text-sm font-medium text-paper">
+          <span className="h-2 w-2 rounded-full bg-koreksi" aria-hidden />
+          Demo: sesi daring langsung, Matematika SMP
         </p>
         <Badge tone="accent">Live caption on</Badge>
       </div>
 
       <div className="flex h-56 items-center justify-center px-6">
         <div className="max-w-xl text-center" aria-live="polite">
-          <p className="h-10 rounded-full px-4 py-2 text-xs uppercase tracking-widest text-white/40">
+          <p className="h-10 rounded-full px-4 py-2 text-xs uppercase tracking-widest text-paper/75">
             caption
           </p>
-          <p className="text-xl font-medium leading-relaxed text-white sm:text-2xl">
+          <p className="text-xl font-medium leading-relaxed text-paper sm:text-2xl">
             {SCRIPT_CAPTION[idx].teks}
           </p>
-          <div className="mx-auto mt-5 h-1 w-40 overflow-hidden rounded-full bg-white/15">
-            <div className="h-full rounded-full bg-[#86c9a8] transition-all" style={{ width: `${progress}%` }} />
+          <div className="mx-auto mt-5 h-1 w-40 overflow-hidden rounded-full bg-paper/25">
+            <div className="h-full rounded-full bg-stabilo transition-all" style={{ width: `${progress}%` }} />
           </div>
         </div>
       </div>
 
-      <div className="flex items-center justify-center gap-4 border-t border-white/10 px-5 py-4">
+      <div className="flex items-center justify-center gap-4 border-t border-paper/20 px-5 py-4">
         <button
           onClick={() => setPlaying((v) => !v)}
-          className="inline-flex items-center gap-2 rounded-md bg-white px-4 py-2 text-sm font-semibold text-[#12110d] transition hover:opacity-90"
+          className="inline-flex items-center gap-2 rounded-md bg-paper px-4 py-2 text-sm font-semibold text-ink transition hover:opacity-90"
         >
           <Captions size={16} aria-hidden />
           {playing ? "Jeda" : "Putar caption"}
         </button>
-        <p className="text-xs text-white/40">Caption otomatis sesuai ujaran tentor (streaming STT).</p>
+        <p className="text-xs text-paper/75">Caption otomatis sesuai ujaran tentor (streaming STT).</p>
       </div>
     </div>
   );

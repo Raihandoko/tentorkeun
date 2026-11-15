@@ -38,7 +38,7 @@ export function VerifyForm() {
     }
   }
 
-  const rekomTone = hasil ? (hasil.skor >= 85 ? "bg-accent-soft text-accent" : hasil.skor >= 60 ? "bg-amber/15 text-[#8a6416]" : "bg-danger-soft text-danger") : "";
+  const rekomTone = hasil ? (hasil.skor >= 85 ? "bg-accent-soft text-accent" : hasil.skor >= 60 ? "bg-peringatan-soft text-peringatan" : "bg-danger-soft text-danger") : "";
 
   return (
     <div>
@@ -47,7 +47,7 @@ export function VerifyForm() {
           e.preventDefault();
           void submit();
         }}
-        className="rounded-lg border border-line bg-card p-6 sm:p-8"
+        className="rounded-xl border border-line bg-card p-6 sm:p-8"
       >
         <label htmlFor="cv" className="mb-2 block text-sm font-semibold text-ink">
           Tempel CV / portofolio calon tentor
@@ -91,7 +91,7 @@ export function VerifyForm() {
               </span>
               <span className="text-sm font-medium text-ink">{hasil.rekomendasi}</span>
             </div>
-            <span className="text-xs text-muted">{hasil.via === "llm" ? "Dihasilkan LLM" : "Mode demo — disimulasikan lokal"}</span>
+            <span className="text-xs text-muted">{hasil.via === "llm" ? "Dihasilkan model bahasa" : "Mode demo, hasil disimulasikan di perangkat"}</span>
           </div>
 
           <Card>

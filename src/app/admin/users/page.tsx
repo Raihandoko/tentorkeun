@@ -16,7 +16,7 @@ export default async function AdminUsersPage() {
   return (
     <section className="py-12">
       <Container>
-        <h1 className="font-serif text-3xl font-semibold text-ink mb-2">Kelola User</h1>
+        <h1 className="font-display text-3xl font-semibold text-ink mb-2">Kelola User</h1>
         <p className="text-muted mb-8">Total: {users.length} user</p>
 
         <div className="space-y-8">
@@ -24,7 +24,7 @@ export default async function AdminUsersPage() {
             <h2 className="font-semibold text-xl text-ink mb-4">Siswa ({students.length})</h2>
             <div className="space-y-2">
               {students.map((u) => (
-                <div key={u.id} className="bg-card border border-line rounded-lg p-4">
+                <div key={u.id} className="bg-card border border-line rounded-xl p-4">
                   <p className="font-semibold text-ink">{u.name}</p>
                   <p className="text-sm text-muted">{u.email} {u.phone && `• ${u.phone}`}</p>
                 </div>
@@ -36,7 +36,7 @@ export default async function AdminUsersPage() {
             <h2 className="font-semibold text-xl text-ink mb-4">Tentor ({tutors.length})</h2>
             <div className="space-y-2">
               {tutors.map((u) => (
-                <div key={u.id} className="bg-card border border-line rounded-lg p-4">
+                <div key={u.id} className="bg-card border border-line rounded-xl p-4">
                   <p className="font-semibold text-ink">{u.name}</p>
                   <p className="text-sm text-muted">{u.email}</p>
                 </div>
@@ -48,7 +48,7 @@ export default async function AdminUsersPage() {
             <h2 className="font-semibold text-xl text-ink mb-4">Admin ({admins.length})</h2>
             <div className="space-y-2">
               {admins.map((u) => (
-                <div key={u.id} className="bg-card border border-line rounded-lg p-4">
+                <div key={u.id} className="bg-card border border-line rounded-xl p-4">
                   <p className="font-semibold text-ink">{u.name}</p>
                   <p className="text-sm text-muted">{u.email}</p>
                 </div>

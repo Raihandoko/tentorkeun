@@ -27,11 +27,11 @@ export default async function TutorProfilePage() {
   return (
     <section className="py-12">
       <Container>
-        <h1 className="font-serif text-3xl font-semibold text-ink mb-2">Profil Saya</h1>
+        <h1 className="font-display text-3xl font-semibold text-ink mb-2">Profil Saya</h1>
         <p className="text-muted mb-8">Informasi tentor Anda</p>
 
         <div className="max-w-3xl space-y-6">
-          <div className="bg-card border border-line rounded-lg p-6">
+          <div className="bg-card border border-line rounded-xl p-6">
             <h2 className="font-semibold text-xl text-ink mb-4">Informasi Dasar</h2>
             <dl className="space-y-3">
               <div>
@@ -54,9 +54,9 @@ export default async function TutorProfilePage() {
                 <dt className="text-sm font-semibold text-ink">Status</dt>
                 <dd className="text-sm">
                   <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                    tutorProfile.status === "approved" ? "bg-green-100 text-green-700" :
-                    tutorProfile.status === "rejected" ? "bg-red-100 text-red-700" :
-                    "bg-yellow-100 text-yellow-700"
+                    tutorProfile.status === "approved" ? "bg-lulus-soft text-lulus" :
+                    tutorProfile.status === "rejected" ? "bg-koreksi-soft text-koreksi" :
+                    "bg-peringatan-soft text-peringatan"
                   }`}>
                     {tutorProfile.status}
                   </span>
@@ -65,7 +65,7 @@ export default async function TutorProfilePage() {
             </dl>
           </div>
 
-          <div className="bg-card border border-line rounded-lg p-6">
+          <div className="bg-card border border-line rounded-xl p-6">
             <h2 className="font-semibold text-xl text-ink mb-4">Pengajaran</h2>
             <dl className="space-y-3">
               <div>
@@ -91,7 +91,7 @@ export default async function TutorProfilePage() {
             </dl>
           </div>
 
-          <div className="bg-card border border-line rounded-lg p-6">
+          <div className="bg-card border border-line rounded-xl p-6">
             <h2 className="font-semibold text-xl text-ink mb-4">Tarif & Jadwal</h2>
             <dl className="space-y-3">
               <div>
@@ -111,7 +111,7 @@ export default async function TutorProfilePage() {
             </dl>
           </div>
 
-          <div className="bg-card border border-line rounded-lg p-6">
+          <div className="bg-card border border-line rounded-xl p-6">
             <h2 className="font-semibold text-xl text-ink mb-4">Rating & Ulasan</h2>
             <dl className="space-y-3">
               <div>

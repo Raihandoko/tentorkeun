@@ -31,7 +31,7 @@ export default async function TutorBookingsPage() {
   return (
     <section className="py-12">
       <Container>
-        <h1 className="font-serif text-3xl font-semibold text-ink mb-2">Jadwal Saya</h1>
+        <h1 className="font-display text-3xl font-semibold text-ink mb-2">Jadwal Saya</h1>
         <p className="text-muted mb-8">Booking & schedule mengajar</p>
 
         {bookings.length === 0 ? (
@@ -39,15 +39,15 @@ export default async function TutorBookingsPage() {
         ) : (
           <div className="space-y-4">
             {bookings.map((b) => (
-              <div key={b.id} className="bg-card border border-line rounded-lg p-6">
+              <div key={b.id} className="bg-card border border-line rounded-xl p-6">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                        b.status === "confirmed" ? "bg-green-100 text-green-700" :
-                        b.status === "completed" ? "bg-blue-100 text-blue-700" :
-                        b.status === "cancelled" ? "bg-red-100 text-red-700" :
-                        "bg-yellow-100 text-yellow-700"
+                        b.status === "confirmed" ? "bg-lulus-soft text-lulus" :
+                        b.status === "completed" ? "bg-accent-soft text-accent" :
+                        b.status === "cancelled" ? "bg-koreksi-soft text-koreksi" :
+                        "bg-peringatan-soft text-peringatan"
                       }`}>
                         {b.status}
                       </span>
@@ -62,7 +62,7 @@ export default async function TutorBookingsPage() {
                       })} • {b.durasi} menit • {b.session_type}
                     </p>
                     {b.kebutuhan && (
-                      <p className="text-sm text-muted mt-2 italic">"{b.kebutuhan}"</p>
+                      <p className="text-sm text-muted mt-2 italic">&ldquo;{b.kebutuhan}&rdquo;</p>
                     )}
                   </div>
                   {b.status === "confirmed" && (

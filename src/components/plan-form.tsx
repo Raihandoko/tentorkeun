@@ -45,7 +45,7 @@ export function PlanForm() {
           e.preventDefault();
           void submit();
         }}
-        className="rounded-lg border border-line bg-card p-6 sm:p-8"
+        className="rounded-xl border border-line bg-card p-6 sm:p-8"
       >
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <Field label="Mata pelajaran">
@@ -85,10 +85,10 @@ export function PlanForm() {
         <div className="mt-10 space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <h2 className="font-serif text-2xl font-semibold text-ink">{hasil.judul}</h2>
+              <h2 className="font-display text-2xl font-semibold text-ink">{hasil.judul}</h2>
               <p className="mt-1 text-sm text-muted">{hasil.target}</p>
             </div>
-            <span className="text-xs text-muted">{hasil.via === "llm" ? "Dihasilkan LLM" : "Mode demo — disimulasikan lokal"}</span>
+            <span className="text-xs text-muted">{hasil.via === "llm" ? "Dihasilkan model bahasa" : "Mode demo, hasil disimulasikan di perangkat"}</span>
           </div>
 
           <Card>
