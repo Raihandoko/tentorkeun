@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { CalendarDays, MapPin, Star, Users } from "lucide-react";
 import { tutores } from "@/lib/data/tutors";
 import { formatHarga } from "@/lib/format";
-import { initials } from "@/components/tutor-card";
+import { Avatar } from "@/components/tutor-card";
 import { Badge, Card, Container } from "@/components/ui";
 import { auth } from "@/lib/auth";
 import { BookingForm } from "@/components/booking-form";
@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const { id } = await params;
   const tutor = tutores.find((t) => t.id === id);
   if (!tutor) return { title: "Tentor tidak ditemukan" };
-  return { title: `${tutor.nama} — Tentor ${tutor.mapel[0]}` };
+  return { title: `${tutor.nama}, tentor ${tutor.mapel[0]}` };
 }
 
 export default async function TutorDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -39,15 +39,13 @@ export default async function TutorDetailPage({ params }: { params: Promise<{ id
           </Link>
 
           <div className="mt-5 flex items-start gap-5">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-accent-soft font-serif text-2xl font-semibold text-accent">
-              {initials(tutor.nama)}
-            </div>
+            <Avatar nama={tutor.nama} size={64} />
             <div>
-              <h1 className="font-serif text-3xl font-semibold tracking-tight text-ink">{tutor.nama}</h1>
+              <h1 className="font-display text-3xl font-semibold tracking-tight text-ink">{tutor.nama}</h1>
               <p className="mt-1 text-muted">{tutor.gelar}</p>
               <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted">
                 <span className="inline-flex items-center gap-1">
-                  <Star size={14} className="fill-amber text-amber" aria-hidden /> {tutor.rating.toFixed(1)}
+                  <Star size={14} className="fill-peringatan text-peringatan" aria-hidden /> {tutor.rating.toFixed(1)}
                   <span className="text-xs">({tutor.ulasanCount} ulasan)</span>
                 </span>
                 <span className="inline-flex items-center gap-1"><MapPin size={13} aria-hidden /> {tutor.kota}</span>
@@ -88,7 +86,7 @@ export default async function TutorDetailPage({ params }: { params: Promise<{ id
           <Card>
             <p className="eyebrow">Tarif & jenis sesi</p>
             <div className="mt-3 flex items-end justify-between">
-              <span className="font-serif text-3xl font-semibold text-ink">{formatHarga(tutor.hargaPerSesi)}</span>
+              <span className="font-display text-3xl font-semibold text-ink">{formatHarga(tutor.hargaPerSesi)}</span>
               <span className="text-sm text-muted">/ 60 menit</span>
             </div>
             <p className="mt-1 text-xs text-muted">
@@ -96,7 +94,7 @@ export default async function TutorDetailPage({ params }: { params: Promise<{ id
             </p>
             <div className="mt-4 flex gap-2">
               {tutor.sesiTersedia.map((s) => (
-                <Badge key={s} tone={s === "online" ? "amber" : "neutral"}>{s === "online" ? "Online / daring" : "Offline / tatap muka"}</Badge>
+                <Badge key={s} tone={s === "online" ? "accent" : "neutral"}>{s === "online" ? "Online / daring" : "Offline / tatap muka"}</Badge>
               ))}
             </div>
 
@@ -130,7 +128,7 @@ export default async function TutorDetailPage({ params }: { params: Promise<{ id
                   href={`/ajukan`}
                   className="mt-2 block w-full rounded-md border border-ink/25 px-4 py-3 text-center text-sm font-semibold text-ink transition hover:border-ink/50"
                 >
-                  Cocokkan kebutuhan lain dengan AI
+                  Cari tentor untuk kebutuhan lain
                 </Link>
               </>
             )}

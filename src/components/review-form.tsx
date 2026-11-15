@@ -46,7 +46,7 @@ export function ReviewForm({ tutorId, tutorNama, bookingId }: ReviewFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-lg border border-line bg-card p-6">
+    <form onSubmit={handleSubmit} className="rounded-xl border border-line bg-card p-6">
       <p className="mb-4 text-sm font-semibold text-ink">
         Beri ulasan untuk {tutorNama}
       </p>
@@ -67,7 +67,7 @@ export function ReviewForm({ tutorId, tutorNama, bookingId }: ReviewFormProps) {
                 size={32}
                 className={
                   star <= (hoverRating || rating)
-                    ? "fill-amber text-amber"
+                    ? "fill-peringatan text-peringatan"
                     : "text-line"
                 }
                 aria-hidden

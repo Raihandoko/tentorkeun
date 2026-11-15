@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Accessibility, BookOpen, Contrast, Mic, Volume2, X } from "lucide-react";
+import { Accessibility, BookOpen, Contrast, Mic, Volume2, Wind, X } from "lucide-react";
 import Link from "next/link";
 import { useA11y } from "@/components/a11y";
 
 export function A11yToolbar() {
   const [open, setOpen] = useState(false);
-  const { dyslexic, contrast, tts, setDyslexic, setContrast, toggleTts } = useA11y();
+  const { dyslexic, contrast, reduceMotion, tts, setDyslexic, setContrast, setReduceMotion, toggleTts } = useA11y();
 
   return (
     <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2">
@@ -15,7 +15,7 @@ export function A11yToolbar() {
         <div
           role="dialog"
           aria-label="Pengaturan aksesibilitas"
-          className="w-64 rounded-lg border border-line bg-card p-4 shadow-[0_12px_32px_rgba(31,32,27,0.16)]"
+          className="w-64 rounded-xl border border-ink/25 bg-card p-4"
         >
           <div className="mb-3 flex items-center justify-between">
             <p className="text-sm font-semibold text-ink">Aksesibilitas</p>
@@ -50,6 +50,13 @@ export function A11yToolbar() {
               on={contrast}
               onClick={() => setContrast(!contrast)}
             />
+            <ToggleRow
+              icon={<Wind size={16} />}
+              label="Kurangi animasi"
+              sub="Gerakan jadi diam atau instan"
+              on={reduceMotion}
+              onClick={() => setReduceMotion(!reduceMotion)}
+            />
           </div>
 
           <Link
@@ -67,7 +74,7 @@ export function A11yToolbar() {
         onClick={() => setOpen((v) => !v)}
         aria-label="Buka pengaturan aksesibilitas"
         aria-expanded={open}
-        className="flex items-center gap-2 rounded-full bg-ink px-4 py-3 text-sm font-medium text-paper shadow-[0_8px_24px_rgba(31,32,27,0.28)] transition hover:opacity-90"
+        className="flex items-center gap-2 rounded-full bg-ink px-4 py-3 text-sm font-semibold text-paper btn-press hover:opacity-90"
       >
         <Accessibility size={18} aria-hidden />
         Aksesibilitas

@@ -43,7 +43,7 @@ export function SessionForm({ bookingId }: { bookingId?: string }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-lg border border-line bg-card p-6">
+    <form onSubmit={handleSubmit} className="rounded-xl border border-line bg-card p-6">
       {!bookingId && (
         <Alert tone="error" className="mb-4">
           Booking ID tidak ditemukan. Kembali ke halaman booking.

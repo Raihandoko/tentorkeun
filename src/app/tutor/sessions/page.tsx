@@ -30,7 +30,7 @@ export default async function TutorSessionsPage() {
   return (
     <section className="py-12">
       <Container>
-        <h1 className="font-serif text-3xl font-semibold text-ink mb-2">Riwayat Sesi</h1>
+        <h1 className="font-display text-3xl font-semibold text-ink mb-2">Riwayat Sesi</h1>
         <p className="text-muted mb-8">Sesi mengajar yang sudah selesai</p>
 
         {sessions.length === 0 ? (
@@ -38,7 +38,7 @@ export default async function TutorSessionsPage() {
         ) : (
           <div className="space-y-4">
             {sessions.map((s) => (
-              <div key={s.id} className="bg-card border border-line rounded-lg p-6">
+              <div key={s.id} className="bg-card border border-line rounded-xl p-6">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
                     <h3 className="font-semibold text-ink">{s.student_name}</h3>

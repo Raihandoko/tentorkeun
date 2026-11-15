@@ -19,7 +19,7 @@ export default async function StudentReportsPage() {
   return (
     <section className="py-12">
       <Container>
-        <h1 className="font-serif text-3xl font-semibold text-ink mb-2">Laporan Progress</h1>
+        <h1 className="font-display text-3xl font-semibold text-ink mb-2">Laporan Progress</h1>
         <p className="text-muted mb-8">Perkembangan belajar dari tentor</p>
 
         {reports.length === 0 ? (
@@ -27,9 +27,9 @@ export default async function StudentReportsPage() {
         ) : (
           <div className="space-y-6">
             {reports.map((r) => (
-              <div key={r.id} className="bg-card border border-line rounded-lg p-6">
+              <div key={r.id} className="bg-card border border-line rounded-xl p-6">
                 <div className="mb-4">
-                  <h3 className="font-serif text-xl font-semibold text-ink">{r.judul}</h3>
+                  <h3 className="font-display text-xl font-semibold text-ink">{r.judul}</h3>
                   <p className="text-sm text-muted">
                     {r.tutor_nama} • {new Date(r.created_at).toLocaleDateString("id-ID")}
                   </p>

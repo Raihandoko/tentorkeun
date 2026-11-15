@@ -2,50 +2,53 @@ import Link from "next/link";
 import { Container } from "@/components/ui";
 import { Logo } from "@/components/logo";
 
+const col = "text-sm text-muted";
+const lnk = "hover:text-ink hover:underline underline-offset-4";
+
 export function SiteFooter() {
   return (
-    <footer className="mt-24 border-t border-line bg-card">
+    <footer id="footer" className="relative mt-0 border-t border-line bg-card">
       <Container className="grid gap-10 py-14 sm:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div>
           <Logo />
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted">
-            Agensi bimbingan belajar privat yang mempertemukan siswa dengan tentor terverifikasi,
-            dipandu AI untuk kecocokan yang benar-benar singkat.
+            Bimbel privat yang mempertemukan siswa dengan tentor yang sudah diverifikasi. Cerita kebutuhanmu, kami
+            carikan yang paling cocok.
           </p>
         </div>
 
         <nav aria-label="Layanan">
-          <p className="eyebrow mb-3">Layanan</p>
-          <ul className="space-y-2 text-sm text-muted">
-            <li><Link className="hover:text-ink" href="/ajukan">Cocokkan dengan AI</Link></li>
-            <li><Link className="hover:text-ink" href="/tentor">Katalog tentor</Link></li>
-            <li><Link className="hover:text-ink" href="/lapor">Laporan otomatis</Link></li>
-            <li><Link className="hover:text-ink" href="/rencana">Rencana belajar</Link></li>
+          <p className="mb-3 text-sm font-semibold text-ink">Layanan</p>
+          <ul className={`space-y-2 ${col}`}>
+            <li><Link className={lnk} href="/ajukan">Cari tentor</Link></li>
+            <li><Link className={lnk} href="/tentor">Katalog tentor</Link></li>
+            <li><Link className={lnk} href="/lapor">Laporan perkembangan</Link></li>
+            <li><Link className={lnk} href="/rencana">Rencana belajar</Link></li>
           </ul>
         </nav>
 
         <nav aria-label="Untuk lembaga">
-          <p className="eyebrow mb-3">Untuk Agency</p>
-          <ul className="space-y-2 text-sm text-muted">
-            <li><Link className="hover:text-ink" href="/verifikasi">Verifikasi tentor</Link></li>
-            <li><Link className="hover:text-ink" href="/aksesibilitas">Dukungan ABK</Link></li>
-            <li><Link className="hover:text-ink" href="/tentor?abk=1">Tentor bersertifikat ABK</Link></li>
+          <p className="mb-3 text-sm font-semibold text-ink">Untuk agensi</p>
+          <ul className={`space-y-2 ${col}`}>
+            <li><Link className={lnk} href="/verifikasi">Verifikasi tentor</Link></li>
+            <li><Link className={lnk} href="/aksesibilitas">Dukungan ABK</Link></li>
+            <li><Link className={lnk} href="/tentor?abk=1">Tentor bersertifikat ABK</Link></li>
           </ul>
         </nav>
 
         <div>
-          <p className="eyebrow mb-3">Kontak</p>
-          <ul className="space-y-2 text-sm text-muted">
+          <p className="mb-3 text-sm font-semibold text-ink">Kontak</p>
+          <ul className={`space-y-2 ${col}`}>
             <li>halo@tentorkeun.id</li>
-            <li>+62 812-0000-2026</li>
-            <li>Senin–Sabtu, 08.00–20.00 WIB</li>
+            <li className="num">+62 812-0000-2026</li>
+            <li>Senin sampai Sabtu, 08.00 sampai 20.00 WIB</li>
           </ul>
         </div>
       </Container>
       <div className="border-t border-line py-5">
         <Container className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
-          <span>© 2026 TentorKeun. Demo produk.</span>
-          <span>Tanpa API key, seluruh fitur berjalan dalam mode simulasi.</span>
+          <span>© 2026 TentorKeun. Produk demo.</span>
+          <span>Tanpa API key, semua fitur jalan dalam mode simulasi.</span>
         </Container>
       </div>
     </footer>

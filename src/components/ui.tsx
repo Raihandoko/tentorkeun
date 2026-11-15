@@ -5,30 +5,28 @@ export function Container({ children, className = "" }: { children: ReactNode; c
   return <div className={`mx-auto w-full max-w-6xl px-5 sm:px-8 ${className}`}>{children}</div>;
 }
 
-/* Label kecil kapital di atas judul */
+/* Label kecil di atas judul (tidak lagi kapital ber-tracking) */
 export function Eyebrow({ children }: { children: ReactNode }) {
   return <p className="eyebrow">{children}</p>;
 }
 
-/* Kartu */
+/* Kartu: sudut tajam, tanpa bayangan blur */
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return (
-    <div className={`rounded-lg border border-line bg-card p-6 shadow-[0_1px_2px_rgba(31,32,27,0.04)] ${className}`}>
-      {children}
-    </div>
-  );
+  return <div className={`rounded-2xl border border-line bg-card p-6 ${className}`}>{children}</div>;
 }
 
-/* Tombol */
-const primaryBtn =
-  "inline-flex items-center justify-center gap-2 rounded-md bg-accent px-4 py-2.5 text-sm font-semibold text-accent-ink transition hover:opacity-90 disabled:opacity-50";
-const secondaryBtn =
-  "inline-flex items-center justify-center gap-2 rounded-md border border-ink/25 bg-transparent px-4 py-2.5 text-sm font-semibold text-ink transition hover:border-ink/50 disabled:opacity-50";
-const ghostBtn =
-  "inline-flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-ink transition hover:bg-ink/5 disabled:opacity-50";
+/* Tombol. Efek tekan lewat CSS, panah pakai class arrow-nudge di dalam. */
+const baseBtn =
+  "btn-press group/btn inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50";
+const primaryBtn = `${baseBtn} bg-accent text-accent-ink hover:bg-accent-hover`;
+const secondaryBtn = `${baseBtn} border border-ink/30 bg-transparent text-ink hover:border-ink hover:bg-ink/5`;
+const ghostBtn = `${baseBtn} text-ink hover:bg-ink/5`;
+const ctaBtn = `${primaryBtn} btn-dot`;
+const dangerBtn = `${baseBtn} bg-koreksi text-koreksi-ink hover:opacity-90`;
 
-export function buttonClass(variant: "primary" | "secondary" | "ghost" = "primary", full = false) {
-  const base = variant === "primary" ? primaryBtn : variant === "secondary" ? secondaryBtn : ghostBtn;
+export function buttonClass(variant: "primary" | "secondary" | "ghost" | "danger" | "cta" = "primary", full = false) {
+  const base =
+    variant === "primary" ? primaryBtn : variant === "secondary" ? secondaryBtn : variant === "danger" ? dangerBtn : variant === "cta" ? ctaBtn : ghostBtn;
   return `${base} ${full ? "w-full" : ""}`;
 }
 
@@ -54,52 +52,71 @@ export function Field({
 }
 
 export function inputClass(extra = "") {
-  return `w-full rounded-md border border-line bg-card px-3.5 py-2.5 text-sm text-ink placeholder:text-muted/60 focus:border-accent focus:outline-none ${extra}`;
+  return `w-full rounded-xl border border-line bg-card px-3.5 py-2.5 text-[15px] text-ink placeholder:text-muted/70 focus:border-transparent focus:outline-none ${extra}`;
 }
 
+/* Garis bawah biru terisi dari kiri saat fokus, seperti ditarik pulpen */
 export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
   const { className, ...rest } = props;
-  return <input className={inputClass(className)} {...rest} />;
+  return (
+    <div className="ink-field">
+      <input className={inputClass(className)} {...rest} />
+    </div>
+  );
 }
 
 export function Textarea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
   const { className, ...rest } = props;
-  return <textarea className={`${inputClass(className)} min-h-28 resize-y`} {...rest} />;
+  return (
+    <div className="ink-field">
+      <textarea className={`${inputClass(className)} min-h-28 resize-y`} {...rest} />
+    </div>
+  );
 }
 
 export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
   const { className, children, ...rest } = props;
   return (
-    <select className={`${inputClass(className)} cursor-pointer`} {...rest}>
-      {children}
-    </select>
+    <div className="ink-field">
+      <select className={`${inputClass(className)} cursor-pointer`} {...rest}>
+        {children}
+      </select>
+    </div>
   );
 }
 
-/* Badge kecil */
-export function Badge({ children, tone = "neutral" }: { children: ReactNode; tone?: "neutral" | "accent" | "rust" | "amber" | "danger" }) {
-  const tones: Record<string, string> = {
-    neutral: "bg-ink/6 text-ink/70",
+type Tone = "neutral" | "accent" | "lulus" | "peringatan" | "koreksi" | "rust" | "amber" | "danger";
+
+/* Badge kecil: selalu teks, warna hanya penguat */
+export function Badge({ children, tone = "neutral" }: { children: ReactNode; tone?: Tone }) {
+  const tones: Record<Tone, string> = {
+    neutral: "bg-ink/8 text-ink/80",
     accent: "bg-accent-soft text-accent",
-    rust: "bg-danger-soft text-danger",
-    amber: "bg-amber/15 text-[#8a6416]",
-    danger: "bg-danger-soft text-danger",
+    lulus: "bg-lulus-soft text-lulus",
+    peringatan: "bg-peringatan-soft text-peringatan",
+    koreksi: "bg-koreksi-soft text-koreksi",
+    rust: "bg-koreksi-soft text-koreksi",
+    amber: "bg-peringatan-soft text-peringatan",
+    danger: "bg-koreksi-soft text-koreksi",
   };
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${tones[tone]}`}>{children}</span>
+    <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ${tones[tone]}`}>
+      {children}
+    </span>
   );
 }
 
 export function Skeleton({ className = "" }: { className?: string }) {
-  return <div className={`animate-pulse rounded-md bg-ink/8 ${className}`} />;
+  return <div className={`skeleton ${className}`} aria-hidden />;
 }
 
-export function Alert({ tone, children }: { tone: "error" | "info"; children: ReactNode }) {
+export function Alert({ tone, children, className = "" }: { tone: "error" | "info"; children: ReactNode; className?: string }) {
   return (
     <div
-      className={`rounded-md border px-4 py-3 text-sm ${
-        tone === "error" ? "border-danger/30 bg-danger-soft text-danger" : "border-accent/30 bg-accent-soft text-accent"
-      }`}
+      role={tone === "error" ? "alert" : undefined}
+      className={`rounded-lg border-l-4 px-4 py-3 text-sm ${
+        tone === "error" ? "border-koreksi bg-koreksi-soft text-koreksi" : "border-accent bg-accent-soft text-accent"
+      } ${className}`}
     >
       {children}
     </div>
@@ -121,8 +138,8 @@ export function SectionHeading({
   return (
     <div className={className}>
       {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-      <h2 className="mt-2 font-serif text-3xl font-medium tracking-tight text-ink sm:text-4xl">{title}</h2>
-      {desc && <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted">{desc}</p>}
+      <h2 className="mt-2 text-3xl font-semibold text-ink sm:text-4xl">{title}</h2>
+      {desc && <p className="mt-3 max-w-2xl text-base leading-relaxed text-muted">{desc}</p>}
     </div>
   );
 }

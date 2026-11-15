@@ -167,7 +167,7 @@ export function BookingForm({ tutorId, tutorNama, tutorMapel, tutorJenjang, tuto
       <div className="rounded-md border border-line bg-card p-4">
         <div className="flex items-center justify-between">
           <span className="text-sm text-muted">Estimasi biaya:</span>
-          <span className="font-serif text-xl font-semibold text-ink">
+          <span className="font-display text-xl font-semibold text-ink">
             Rp{(tutorHarga * parseInt(durasi) / 60).toLocaleString("id-ID")}
           </span>
         </div>

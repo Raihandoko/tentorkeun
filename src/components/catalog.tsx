@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2, SlidersHorizontal } from "lucide-react";
+import { ChevronDown, Loader2, SlidersHorizontal } from "lucide-react";
 import type { Tutor } from "@/lib/types";
 import { TutorCard } from "@/components/tutor-card";
 import { buttonClass, Field, Input, Select } from "@/components/ui";
@@ -22,6 +22,8 @@ export function Catalog() {
   const [data, setData] = useState<Tutor[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [filterOpen, setFilterOpen] = useState(false);
+  const aktif = [mapel, jenjang, kota, sesi, maxHarga].filter(Boolean).length + (abkOnly ? 1 : 0);
 
   async function load() {
     setLoading(true);
@@ -69,12 +71,26 @@ export function Catalog() {
   }, []);
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[280px_1fr]">
-      <aside aria-label="Filter katalog" className="h-fit rounded-lg border border-line bg-card p-5 lg:sticky lg:top-24">
-        <p className="mb-4 flex items-center gap-2 text-sm font-semibold text-ink">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-8">
+      <aside aria-label="Filter katalog" className="h-fit rounded-2xl border border-line bg-card p-5 lg:sticky lg:top-24">
+        <button
+          type="button"
+          onClick={() => setFilterOpen((o) => !o)}
+          aria-expanded={filterOpen}
+          aria-controls="filter-isi"
+          className="flex w-full items-center gap-2 text-sm font-semibold text-ink lg:pointer-events-none"
+        >
           <SlidersHorizontal size={15} aria-hidden /> Filter
-        </p>
-        <div className="space-y-4">
+          {aktif > 0 && (
+            <span className="num rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-accent-ink">{aktif} aktif</span>
+          )}
+          <ChevronDown
+            size={16}
+            aria-hidden
+            className={`ml-auto transition-transform duration-300 lg:hidden ${filterOpen ? "rotate-180" : ""}`}
+          />
+        </button>
+        <div id="filter-isi" className={`${filterOpen ? "block" : "hidden"} mt-4 space-y-4 lg:block`}>
           <Field label="Mata pelajaran">
             <Select value={mapel} onChange={(e) => setMapel(e.target.value)}>
               <option value="">Semua</option>
@@ -130,14 +146,14 @@ export function Catalog() {
         {loading ? (
           <div className="grid gap-5 lg:grid-cols-2">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-56 animate-pulse rounded-lg border border-line bg-card" />
+              <div key={i} className="skeleton h-56 rounded-2xl border border-line bg-card" />
             ))}
           </div>
         ) : data ? (
           <>
             <p className="mb-4 text-sm text-muted">
               {data.length} tentor terverifikasi ditemukan
-              {abkOnly && " · filter ABK aktif"}
+              {abkOnly && ", hanya yang bersertifikat ABK"}
             </p>
             {data.length === 0 ? (
               <p className="rounded-md border border-line bg-card p-8 text-center text-sm text-muted">

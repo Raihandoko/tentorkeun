@@ -1,5 +1,6 @@
 "use client";
 
+import { MotionConfig } from "motion/react";
 import {
   createContext,
   useCallback,
@@ -13,23 +14,27 @@ import {
 interface A11yState {
   dyslexic: boolean;
   contrast: boolean;
+  reduceMotion: boolean;
   tts: boolean;
   setDyslexic: (v: boolean) => void;
   setContrast: (v: boolean) => void;
+  setReduceMotion: (v: boolean) => void;
   toggleTts: () => void;
 }
 
 const A11yContext = createContext<A11yState | null>(null);
 
-function readPref(): { dyslexic: boolean; contrast: boolean } {
-  if (typeof window === "undefined") return { dyslexic: false, contrast: false };
+type Pref = { dyslexic: boolean; contrast: boolean; reduceMotion: boolean };
+
+function readPref(): Pref {
+  if (typeof window === "undefined") return { dyslexic: false, contrast: false, reduceMotion: false };
   try {
     const raw = localStorage.getItem("tentorkeun-a11y");
-    if (!raw) return { dyslexic: false, contrast: false };
-    const d = JSON.parse(raw) as { dyslexic?: boolean; contrast?: boolean };
-    return { dyslexic: Boolean(d.dyslexic), contrast: Boolean(d.contrast) };
+    if (!raw) return { dyslexic: false, contrast: false, reduceMotion: false };
+    const d = JSON.parse(raw) as Partial<Pref>;
+    return { dyslexic: Boolean(d.dyslexic), contrast: Boolean(d.contrast), reduceMotion: Boolean(d.reduceMotion) };
   } catch {
-    return { dyslexic: false, contrast: false };
+    return { dyslexic: false, contrast: false, reduceMotion: false };
   }
 }
 
@@ -37,6 +42,7 @@ export function A11yProvider({ children }: { children: ReactNode }) {
   const [prefs] = useState(readPref);
   const [dyslexic, setDyslexicState] = useState(prefs.dyslexic);
   const [contrast, setContrastState] = useState(prefs.contrast);
+  const [reduceMotion, setReduceMotionState] = useState(prefs.reduceMotion);
   const [tts, setTts] = useState(false);
   const speechRef = useRef<SpeechSynthesisUtterance | null>(null);
 
@@ -44,15 +50,18 @@ export function A11yProvider({ children }: { children: ReactNode }) {
     const el = document.documentElement;
     el.setAttribute("data-a11y-dyslexic", dyslexic ? "1" : "0");
     el.setAttribute("data-a11y-contrast", contrast ? "1" : "0");
+    el.setAttribute("data-a11y-motion", reduceMotion ? "1" : "0");
+    el.setAttribute("data-hydrated", "1");
     try {
-      localStorage.setItem("tentorkeun-a11y", JSON.stringify({ dyslexic, contrast }));
+      localStorage.setItem("tentorkeun-a11y", JSON.stringify({ dyslexic, contrast, reduceMotion }));
     } catch {
       /* abaikan */
     }
-  }, [dyslexic, contrast]);
+  }, [dyslexic, contrast, reduceMotion]);
 
   const setDyslexic = useCallback((v: boolean) => setDyslexicState(v), []);
   const setContrast = useCallback((v: boolean) => setContrastState(v), []);
+  const setReduceMotion = useCallback((v: boolean) => setReduceMotionState(v), []);
 
   const toggleTts = useCallback(() => {
     const synth = window.speechSynthesis;
@@ -90,8 +99,8 @@ export function A11yProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <A11yContext.Provider value={{ dyslexic, contrast, tts, setDyslexic, setContrast, toggleTts }}>
-      {children}
+    <A11yContext.Provider value={{ dyslexic, contrast, reduceMotion, tts, setDyslexic, setContrast, setReduceMotion, toggleTts }}>
+      <MotionConfig reducedMotion={reduceMotion ? "always" : "user"}>{children}</MotionConfig>
     </A11yContext.Provider>
   );
 }

@@ -92,7 +92,7 @@ export function ReportForm() {
           e.preventDefault();
           void submit();
         }}
-        className="rounded-lg border border-line bg-card p-6 sm:p-8"
+        className="rounded-xl border border-line bg-card p-6 sm:p-8"
       >
         <div className="mb-4 flex items-center justify-between gap-3">
           <label htmlFor="catatan" className="block text-sm font-semibold text-ink">
@@ -157,13 +157,13 @@ export function ReportForm() {
       {hasil && (
         <div className="mt-10 space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="font-serif text-2xl font-semibold text-ink">{hasil.judul}</h2>
-            <span className="text-xs text-muted">{hasil.via === "llm" ? "Dihasilkan LLM" : "Mode demo — disimulasikan lokal"}</span>
+            <h2 className="font-display text-2xl font-semibold text-ink">{hasil.judul}</h2>
+            <span className="text-xs text-muted">{hasil.via === "llm" ? "Dihasilkan model bahasa" : "Mode demo, hasil disimulasikan di perangkat"}</span>
           </div>
 
           <Card>
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <span className="eyebrow">Ringkasan eksekutif</span>
+              <span className="eyebrow">Ringkasan</span>
               <span className="flex items-center gap-2 text-sm text-muted">
                 Tren: <Badge tone={hasil.penilaian >= 75 ? "accent" : hasil.penilaian >= 60 ? "amber" : "danger"}>{hasil.tren}</Badge>
               </span>

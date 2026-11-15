@@ -16,7 +16,7 @@ export default async function AdminTutorsPage() {
   return (
     <section className="py-12">
       <Container>
-        <h1 className="font-serif text-3xl font-semibold text-ink mb-2">Kelola Tentor</h1>
+        <h1 className="font-display text-3xl font-semibold text-ink mb-2">Kelola Tentor</h1>
         <p className="text-muted mb-8">Verifikasi & approve tentor baru</p>
 
         <div className="space-y-8">
@@ -27,7 +27,7 @@ export default async function AdminTutorsPage() {
             ) : (
               <div className="space-y-4">
                 {pending.map((t) => (
-                  <div key={t.id} className="bg-card border border-line rounded-lg p-6">
+                  <div key={t.id} className="bg-card border border-line rounded-xl p-6">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
                         <h3 className="font-semibold text-ink">{t.nama}</h3>
@@ -36,12 +36,12 @@ export default async function AdminTutorsPage() {
                       </div>
                       <div className="flex gap-2">
                         <form action={`/api/admin/tutors/${t.id}/approve`} method="POST">
-                          <button className="px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-md hover:bg-green-700">
+                          <button className="px-4 py-2 bg-lulus text-white text-sm font-semibold rounded-md hover:opacity-90">
                             Approve
                           </button>
                         </form>
                         <form action={`/api/admin/tutors/${t.id}/reject`} method="POST">
-                          <button className="px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-md hover:bg-red-700">
+                          <button className="px-4 py-2 bg-koreksi text-koreksi-ink text-sm font-semibold rounded-md hover:opacity-90">
                             Reject
                           </button>
                         </form>
@@ -57,7 +57,7 @@ export default async function AdminTutorsPage() {
             <h2 className="font-semibold text-xl text-ink mb-4">Approved ({approved.length})</h2>
             <div className="space-y-3">
               {approved.map((t) => (
-                <div key={t.id} className="bg-card border border-line rounded-lg p-4">
+                <div key={t.id} className="bg-card border border-line rounded-xl p-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="font-semibold text-ink">{t.nama}</p>
@@ -77,7 +77,7 @@ export default async function AdminTutorsPage() {
               <h2 className="font-semibold text-xl text-ink mb-4">Rejected ({rejected.length})</h2>
               <div className="space-y-3">
                 {rejected.map((t) => (
-                  <div key={t.id} className="bg-card border border-line rounded-lg p-4 opacity-60">
+                  <div key={t.id} className="bg-card border border-line rounded-xl p-4 opacity-60">
                     <p className="font-semibold text-ink">{t.nama}</p>
                     <p className="text-sm text-muted">{t.gelar}</p>
                   </div>

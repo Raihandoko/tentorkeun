@@ -16,7 +16,7 @@ export default async function NewSessionPage({ searchParams }: { searchParams: P
   return (
     <Container className="py-14 sm:py-20">
       <div className="mx-auto max-w-2xl">
-        <h1 className="font-serif text-3xl font-semibold text-ink">Input Sesi Belajar</h1>
+        <h1 className="font-display text-3xl font-semibold text-ink">Input Sesi Belajar</h1>
         <p className="mt-2 text-muted">
           Catat detail sesi yang telah selesai untuk melengkapi rekam belajar siswa.
         </p>
