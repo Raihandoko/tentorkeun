@@ -26,7 +26,9 @@ export const easeOutExpo = [0.16, 1, 0.3, 1] as const;
 export function useNoMotion(): boolean {
   const { reduceMotion } = useA11y();
   const media = useReducedMotion();
-  return reduceMotion || Boolean(media);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  return mounted && (reduceMotion || Boolean(media));
 }
 
 /* Naik dan muncul saat masuk layar, sekali saja */

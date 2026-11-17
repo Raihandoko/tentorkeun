@@ -39,14 +39,23 @@ function readPref(): Pref {
 }
 
 export function A11yProvider({ children }: { children: ReactNode }) {
-  const [prefs] = useState(readPref);
-  const [dyslexic, setDyslexicState] = useState(prefs.dyslexic);
-  const [contrast, setContrastState] = useState(prefs.contrast);
-  const [reduceMotion, setReduceMotionState] = useState(prefs.reduceMotion);
+  const [dyslexic, setDyslexicState] = useState(false);
+  const [contrast, setContrastState] = useState(false);
+  const [reduceMotion, setReduceMotionState] = useState(false);
+  const [preferencesLoaded, setPreferencesLoaded] = useState(false);
   const [tts, setTts] = useState(false);
   const speechRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   useEffect(() => {
+    const prefs = readPref();
+    setDyslexicState(prefs.dyslexic);
+    setContrastState(prefs.contrast);
+    setReduceMotionState(prefs.reduceMotion);
+    setPreferencesLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (!preferencesLoaded) return;
     const el = document.documentElement;
     el.setAttribute("data-a11y-dyslexic", dyslexic ? "1" : "0");
     el.setAttribute("data-a11y-contrast", contrast ? "1" : "0");
@@ -57,7 +66,7 @@ export function A11yProvider({ children }: { children: ReactNode }) {
     } catch {
       /* abaikan */
     }
-  }, [dyslexic, contrast, reduceMotion]);
+  }, [dyslexic, contrast, reduceMotion, preferencesLoaded]);
 
   const setDyslexic = useCallback((v: boolean) => setDyslexicState(v), []);
   const setContrast = useCallback((v: boolean) => setContrastState(v), []);
