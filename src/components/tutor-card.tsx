@@ -17,11 +17,11 @@ export function initials(nama: string): string {
 
 /* Warna avatar deterministik dari nama, semua dari token palet */
 const avatarTones = [
-  { chip: "bg-accent-soft text-accent", spine: "var(--accent)" },
-  { chip: "bg-lulus-soft text-lulus", spine: "var(--lulus)" },
-  { chip: "bg-peringatan-soft text-peringatan", spine: "var(--amber)" },
-  { chip: "bg-koreksi-soft text-koreksi", spine: "var(--koreksi)" },
-  { chip: "bg-stabilo text-[#16211e]", spine: "var(--stabilo)" },
+  { chip: "bg-accent-soft text-accent" },
+  { chip: "bg-lulus-soft text-lulus" },
+  { chip: "bg-peringatan-soft text-peringatan" },
+  { chip: "bg-koreksi-soft text-koreksi" },
+  { chip: "bg-stabilo text-[#16211e]" },
 ];
 function toneIndex(nama: string): number {
   let h = 0;
@@ -30,9 +30,6 @@ function toneIndex(nama: string): number {
 }
 export function avatarTone(nama: string): string {
   return avatarTones[toneIndex(nama)].chip;
-}
-export function avatarSpine(nama: string): string {
-  return avatarTones[toneIndex(nama)].spine;
 }
 
 export function Avatar({ nama, size = 48 }: { nama: string; size?: number }) {
@@ -64,10 +61,7 @@ export function TutorCard({
   detailHref?: string;
 }) {
   return (
-    <article
-      className="lift tutor-card relative flex h-full flex-col rounded-2xl border border-line bg-card py-6 pl-9 pr-6"
-      style={{ ["--spine" as string]: avatarSpine(tutor.nama) }}
-    >
+    <article className="lift tutor-card relative flex h-full flex-col rounded-3xl border border-line bg-card p-6">
       <div className="flex items-start gap-4">
         <Avatar nama={tutor.nama} size={52} />
         <div className="min-w-0 flex-1">
@@ -105,7 +99,7 @@ export function TutorCard({
       </dl>
 
       {skor && (
-        <div className="mt-5 rounded-xl border border-line bg-paper p-4">
+        <div className="mt-5 rounded-2xl border border-line bg-paper p-4">
           <div className="flex items-center justify-between gap-3">
             <span className="text-xs font-semibold text-muted">Kecocokan</span>
             <span className="inline-flex items-center gap-2">
@@ -133,13 +127,13 @@ export function TutorCard({
 
       <div className="mt-auto flex items-end justify-between gap-3 pt-6">
         <p className="num leading-none">
-          <span className="block text-xl font-bold text-ink">{formatHarga(tutor.hargaPerSesi)}</span>
+          <span className="block text-2xl font-extrabold text-ink">{formatHarga(tutor.hargaPerSesi)}</span>
           <span className="mt-1 block text-xs font-normal text-muted">per sesi</span>
         </p>
         {/* Tautan merentang ke seluruh kartu: seluruh kartu bisa diklik */}
         <Link
           href={detailHref}
-          className="group/btn inline-flex items-center gap-1.5 rounded-full bg-accent-soft px-4 py-2 text-sm font-semibold text-accent after:absolute after:inset-0 after:rounded-2xl after:content-[''] hover:bg-accent hover:text-accent-ink focus-visible:bg-accent focus-visible:text-accent-ink"
+          className="group/btn inline-flex items-center gap-1.5 rounded-xl bg-accent-soft px-4 py-2.5 text-sm font-semibold text-accent after:absolute after:inset-0 after:rounded-3xl after:content-[''] hover:bg-accent hover:text-accent-ink focus-visible:bg-accent focus-visible:text-accent-ink"
         >
           Lihat profil
           <span aria-hidden className="arrow-nudge">→</span>
@@ -152,7 +146,7 @@ export function TutorCard({
 /* Bentuknya sama dengan TutorCard supaya layout tidak loncat */
 export function TutorCardSkeleton() {
   return (
-    <div className="flex h-full flex-col rounded-2xl border border-line bg-card py-6 pl-9 pr-6" aria-hidden>
+    <div className="flex h-full flex-col rounded-3xl border border-line bg-card p-6" aria-hidden>
       <div className="flex items-start gap-4">
         <div className="skeleton !rounded-full" style={{ width: 48, height: 48 }} />
         <div className="flex-1 space-y-2">
@@ -167,7 +161,7 @@ export function TutorCardSkeleton() {
         <div className="skeleton h-5 w-14 !rounded-full" />
       </div>
       <div className="mt-4 skeleton h-3 w-4/5" />
-      <div className="mt-5 rounded-xl border border-line bg-paper p-4">
+      <div className="mt-5 rounded-2xl border border-line bg-paper p-4">
         <div className="skeleton h-3 w-1/2" />
         <div className="skeleton mt-3 h-1.5 w-full" />
         <div className="skeleton mt-4 h-3 w-full" />

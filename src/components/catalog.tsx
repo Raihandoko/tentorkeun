@@ -5,6 +5,7 @@ import { ChevronDown, Loader2, SlidersHorizontal } from "lucide-react";
 import type { Tutor } from "@/lib/types";
 import { TutorCard } from "@/components/tutor-card";
 import { buttonClass, Field, Input, Select } from "@/components/ui";
+import { Inview } from "@/components/motion";
 
 const MAPEL = ["Matematika", "Fisika", "Kimia", "Biologi", "Bahasa Inggris", "Bahasa Indonesia", "Calistung", "Ekonomi", "Akuntansi", "UTBK", "IELTS"];
 const JENJANG = ["TK", "SD", "SMP", "SMA", "Mahasiswa"];
@@ -72,7 +73,7 @@ export function Catalog() {
 
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-8">
-      <aside aria-label="Filter katalog" className="h-fit rounded-2xl border border-line bg-card p-5 lg:sticky lg:top-24">
+      <aside aria-label="Filter katalog" className="h-fit rounded-3xl border border-line bg-card p-5 lg:sticky lg:top-24">
         <button
           type="button"
           onClick={() => setFilterOpen((o) => !o)}
@@ -126,7 +127,7 @@ export function Catalog() {
               placeholder="mis. 200"
             />
           </Field>
-          <label className="flex cursor-pointer items-center gap-2.5 rounded-md border border-line px-3 py-2.5 text-sm font-medium text-ink">
+          <label className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-line-strong/50 px-3 py-2.5 text-sm font-medium text-ink">
             <input
               type="checkbox"
               checked={abkOnly}
@@ -146,7 +147,7 @@ export function Catalog() {
         {loading ? (
           <div className="grid gap-5 lg:grid-cols-2">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="skeleton h-56 rounded-2xl border border-line bg-card" />
+              <div key={i} className="skeleton h-56 rounded-3xl border border-line bg-card" />
             ))}
           </div>
         ) : data ? (
@@ -156,13 +157,15 @@ export function Catalog() {
               {abkOnly && ", hanya yang bersertifikat ABK"}
             </p>
             {data.length === 0 ? (
-              <p className="rounded-md border border-line bg-card p-8 text-center text-sm text-muted">
+              <p className="rounded-3xl border border-line bg-card p-8 text-center text-sm text-muted">
                 Tidak ada tentor yang cocok dengan filter ini. Coba longgarkan salah satu filter.
               </p>
             ) : (
               <div className="grid gap-5 lg:grid-cols-2">
-                {data.map((t) => (
-                  <TutorCard key={t.id} tutor={t} />
+                {data.map((t, i) => (
+                  <Inview key={t.id} index={i % 2} y={22} className="h-full">
+                    <TutorCard tutor={t} />
+                  </Inview>
                 ))}
               </div>
             )}

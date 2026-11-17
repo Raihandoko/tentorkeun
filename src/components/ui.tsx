@@ -10,18 +10,18 @@ export function Eyebrow({ children }: { children: ReactNode }) {
   return <p className="eyebrow">{children}</p>;
 }
 
-/* Kartu: sudut tajam, tanpa bayangan blur */
+/* Kartu: garis tipis, sudut membulat, tanpa bayangan */
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
   return <div className={`rounded-2xl border border-line bg-card p-6 ${className}`}>{children}</div>;
 }
 
 /* Tombol. Efek tekan lewat CSS, panah pakai class arrow-nudge di dalam. */
 const baseBtn =
-  "btn-press group/btn inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50";
-const primaryBtn = `${baseBtn} bg-accent text-accent-ink hover:bg-accent-hover`;
-const secondaryBtn = `${baseBtn} border border-ink/30 bg-transparent text-ink hover:border-ink hover:bg-ink/5`;
+  "btn-press group/btn inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50";
+const primaryBtn = `${baseBtn} bg-accent text-accent-ink shadow-[0_8px_18px_-10px_var(--accent)] hover:bg-accent-hover`;
+const secondaryBtn = `${baseBtn} border border-line-strong/60 bg-card text-ink hover:border-ink hover:bg-ink/[0.03]`;
 const ghostBtn = `${baseBtn} text-ink hover:bg-ink/5`;
-const ctaBtn = `${primaryBtn} btn-dot`;
+const ctaBtn = primaryBtn;
 const dangerBtn = `${baseBtn} bg-koreksi text-koreksi-ink hover:opacity-90`;
 
 export function buttonClass(variant: "primary" | "secondary" | "ghost" | "danger" | "cta" = "primary", full = false) {
@@ -52,14 +52,14 @@ export function Field({
 }
 
 export function inputClass(extra = "") {
-  return `w-full rounded-xl border border-line bg-card px-3.5 py-2.5 text-[15px] text-ink placeholder:text-muted/70 focus:border-transparent focus:outline-none ${extra}`;
+  return `w-full rounded-xl border border-line-strong bg-card px-3.5 py-2.5 text-[15px] text-ink placeholder:text-muted/70 focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15 ${extra}`;
 }
 
-/* Garis bawah biru terisi dari kiri saat fokus, seperti ditarik pulpen */
+/* Input dibungkus div supaya tata letak lama tetap sama */
 export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
   const { className, ...rest } = props;
   return (
-    <div className="ink-field">
+    <div>
       <input className={inputClass(className)} {...rest} />
     </div>
   );
@@ -68,7 +68,7 @@ export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
 export function Textarea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
   const { className, ...rest } = props;
   return (
-    <div className="ink-field">
+    <div>
       <textarea className={`${inputClass(className)} min-h-28 resize-y`} {...rest} />
     </div>
   );
@@ -77,7 +77,7 @@ export function Textarea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
 export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
   const { className, children, ...rest } = props;
   return (
-    <div className="ink-field">
+    <div>
       <select className={`${inputClass(className)} cursor-pointer`} {...rest}>
         {children}
       </select>

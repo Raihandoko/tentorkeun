@@ -1,129 +1,193 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import { Container, buttonClass } from "@/components/ui";
+import { ListChecks, ShieldCheck, UserCheck } from "lucide-react";
+import { buttonClass } from "@/components/ui";
 import { HomeHero } from "@/components/home-hero";
-import { IntroCurtain } from "@/components/intro-curtain";
-import { BowlGlow } from "@/components/bowl-glow";
-import { HomeStory } from "@/components/home-story";
-import { ClipWords, Inview, StabiloSweep } from "@/components/motion";
+import { FlowSection, ProblemSteps, StatBand } from "@/components/home-sections";
+import { ClipWords, Inview, ScrollPanel, ScrollSlide } from "@/components/motion";
+import { Logo } from "@/components/logo";
+import { tutores } from "@/lib/data/tutors";
 
-const fitur = [
+const mapel = [
+  { n: "Calistung", j: "TK sampai SD" },
+  { n: "Matematika", j: "SD sampai kuliah" },
+  { n: "Fisika", j: "SMP dan SMA" },
+  { n: "Kimia", j: "SMA" },
+  { n: "Biologi", j: "SMA" },
+  { n: "Bahasa Inggris", j: "Semua jenjang" },
+  { n: "Bahasa Indonesia", j: "SD sampai SMA" },
+  { n: "Ekonomi", j: "SMA" },
+  { n: "Akuntansi", j: "SMA dan kuliah" },
+  { n: "UTBK", j: "Persiapan kuliah" },
+  { n: "IELTS", j: "Dewasa dan mahasiswa" },
+];
+
+function MarqueeRow({ reverse = false, offset = 0 }: { reverse?: boolean; offset?: number }) {
+  const list = [...mapel.slice(offset), ...mapel.slice(0, offset)];
+  return (
+    <div className="marquee">
+      <ScrollSlide from={reverse ? 0 : -70} to={reverse ? -70 : 0}>
+      <div className="marquee-track" style={reverse ? { animationDirection: "reverse" } : undefined}>
+        {[0, 1].map((copy) => (
+          <ul key={copy} className="flex shrink-0 gap-3 pr-3" aria-hidden={copy === 1 ? true : undefined}>
+            {list.map((m) => (
+              <li
+                key={m.n}
+                className="w-52 shrink-0 rounded-2xl border border-line bg-card px-5 py-4 sm:w-60"
+              >
+                <p className="font-display text-lg font-extrabold text-ink">{m.n}</p>
+                <p className="mt-0.5 text-sm text-muted">{m.j}</p>
+              </li>
+            ))}
+          </ul>
+        ))}
+      </div>
+      </ScrollSlide>
+    </div>
+  );
+}
+
+const trust = [
   {
-    judul: "Cari tentor dengan cerita",
-    desc: "Tulis seperti sedang ngobrol: mapel, jenjang, budget, jadwal, kebiasaan belajar anak. Hasilnya berupa peringkat tentor dengan alasan di setiap nama.",
-    href: "/ajukan",
-    cta: "Coba cari",
+    icon: UserCheck,
+    t: "Keputusan tetap di kamu",
+    d: "AI hanya menyarankan dan mengurutkan. Kamu yang memilih tentor dan memutuskan lanjut atau tidak.",
   },
   {
-    judul: "Tentor sudah dicek duluan",
-    desc: "CV dan portofolio disaring sebelum tentor tampil. Admin mendapat ringkasan, catatan yang perlu dikonfirmasi, dan pertanyaan untuk wawancara.",
-    href: "/verifikasi",
-    cta: "Lihat caranya",
+    icon: ListChecks,
+    t: "Skor selalu ada alasannya",
+    d: "Setiap tentor di hasil pencarian disertai alasan yang bisa kamu baca, bukan angka misterius.",
   },
   {
-    judul: "Laporan untuk orang tua",
-    desc: "Catatan sesi dari tentor diubah jadi laporan rapi: apa yang sudah dikuasai, bagian yang perlu dilatih, dan saran untuk pekan depan.",
-    href: "/lapor",
-    cta: "Buat laporan",
-  },
-  {
-    judul: "Rencana belajar mingguan",
-    desc: "Disusun dari target dan titik lemah siswa, lengkap dengan soal latihan yang naik tingkat pelan-pelan.",
-    href: "/rencana",
-    cta: "Susun rencana",
-  },
-  {
-    judul: "Ramah untuk siswa ABK",
-    desc: "Filter tentor bersertifikat ABK, materi yang disederhanakan untuk disleksia, tunanetra, tunarungu, ADHD, dan autisme, plus bacaan suara dan caption langsung.",
-    href: "/aksesibilitas",
-    cta: "Lihat fiturnya",
+    icon: ShieldCheck,
+    t: "Disaring sebelum tampil",
+    d: "CV dan portofolio dicek lebih dulu, lalu admin mengonfirmasi bagian yang masih meragukan.",
   },
 ];
 
 export default function Home() {
+  const total = tutores.length;
+  const abk = tutores.filter((t) => t.sertifikasiABK).length;
+  const rating = tutores.reduce((a, t) => a + t.rating, 0) / total;
+
   return (
     <>
-      <BowlGlow />
-      <IntroCurtain />
       <HomeHero />
-      <HomeStory />
 
-      {/* ---------- Fitur ---------- */}
-      <section id="fitur" className="relative z-[3] border-b border-line bg-paper">
-        <Container className="grid gap-12 py-20 sm:py-24 lg:grid-cols-[0.8fr_1.4fr] lg:gap-20">
-          <div className="lg:sticky lg:top-28 lg:self-start">
-            <ClipWords
-              text="Tentornya ketemu, kami tetap ikut membantu."
-              className="text-3xl font-bold leading-tight text-ink sm:text-4xl"
-            />
-            <Inview index={2} y={20}>
-              <p className="mt-4 max-w-sm text-base leading-relaxed text-muted">
-                Setelah sesi berjalan ada laporan untuk orang tua, rencana belajar mingguan, dan dukungan untuk siswa ABK.
-              </p>
-            </Inview>
+      {/* ---------- Alur: tulis seperti biasa ---------- */}
+      <section className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
+        <ClipWords
+          text="Cukup tulis seperti biasa, TentorKeun yang memilah."
+          className="mx-auto max-w-2xl text-center text-3xl font-extrabold leading-tight text-ink sm:text-5xl"
+        />
+        <Inview index={1} y={20}>
+          <p className="mx-auto mt-4 max-w-xl text-center text-base leading-relaxed text-muted">
+            Satu kalimat bebas diubah jadi kriteria yang jelas: mapel, budget, gaya belajar, kebutuhan khusus, dan jadwal.
+          </p>
+        </Inview>
+        <Inview index={2} y={32}>
+          <div className="mt-12 sm:mt-14">
+            <FlowSection />
           </div>
-
-          <ul className="divide-y divide-line border-y border-line">
-            {fitur.map((f, i) => (
-              <Inview as="li" key={f.href} index={i} y={28}>
-                <Link
-                  href={f.href}
-                  className="group/btn grid gap-2 py-7 sm:grid-cols-[1fr_auto] sm:items-start sm:gap-8 hover:bg-card focus-visible:bg-card sm:px-4 sm:-mx-4"
-                >
-                  <span>
-                    <span className="block text-xl font-semibold text-ink">{f.judul}</span>
-                    <span className="mt-2 block max-w-xl text-[15px] leading-relaxed text-muted">{f.desc}</span>
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent sm:pt-1">
-                    {f.cta}
-                    <ArrowRight size={15} className="arrow-nudge" aria-hidden />
-                  </span>
-                </Link>
-              </Inview>
-            ))}
-          </ul>
-        </Container>
+        </Inview>
       </section>
 
-      {/* ---------- Semua jenjang + CTA ---------- */}
-      <section className="relative z-[3] bg-paper">
-        <Container className="py-20 sm:py-24">
-          <div className="grid items-center gap-10 lg:grid-cols-[1.2fr_1fr]">
+      {/* ---------- Pita statistik ---------- */}
+      <section className="px-3 sm:px-6">
+        <ScrollPanel className="mx-auto max-w-[1240px]">
+          <StatBand total={total} abk={abk} rating={rating} />
+        </ScrollPanel>
+      </section>
+
+      {/* ---------- Masalah dan jawaban ---------- */}
+      <section className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
+        <ProblemSteps />
+      </section>
+
+      {/* ---------- Mapel ---------- */}
+      <section className="overflow-hidden pb-20 sm:pb-28">
+        <div className="mx-auto max-w-6xl px-5 sm:px-8">
+          <ClipWords
+            text="Dari calistung sampai UTBK."
+            className="text-center text-3xl font-extrabold leading-tight text-ink sm:text-5xl"
+          />
+          <Inview index={1} y={20}>
+            <p className="mx-auto mt-4 max-w-md text-center text-base leading-relaxed text-muted">
+              Apa pun mapelnya, caranya sama: ceritakan kebutuhanmu, sisanya kami urus.
+            </p>
+          </Inview>
+        </div>
+        <Inview index={2} y={24}>
+          <div className="mt-12 space-y-3">
+            <MarqueeRow />
+            <MarqueeRow reverse offset={5} />
+          </div>
+        </Inview>
+      </section>
+
+      {/* ---------- Kepercayaan ---------- */}
+      <section className="px-3 sm:px-6">
+        <ScrollPanel className="tint-block mx-auto max-w-[1240px] rounded-[1.75rem] sm:rounded-[2.25rem]">
+          <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-14 sm:px-8 sm:py-20 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
             <div>
               <ClipWords
-                text="Calistung sampai skripsi, ada tentornya."
-                className="text-3xl font-bold leading-tight text-ink sm:text-4xl"
+                text="AI membantu mencari, keputusannya tetap di kamu."
+                className="text-3xl font-extrabold leading-tight text-ink sm:text-4xl"
               />
-              <Inview index={2}>
-                <p className="mt-4 max-w-lg text-base leading-relaxed text-muted">
-                  Dari calistung, olimpiade, dan UTBK, sampai tahfiz, bahasa asing, dan pemrograman. Ceritakan
-                  yang kamu butuhkan, sisanya kami urus.
+              <Inview index={1} y={20}>
+                <p className="mt-4 max-w-md text-base leading-relaxed text-muted">
+                  TentorKeun mengerti bahasa sehari-hari, tapi tidak memutuskan apa pun untukmu. Semua hasil bisa kamu baca
+                  alasannya dan kamu cek sendiri.
                 </p>
-                <div className="mt-8 flex flex-wrap items-center gap-3">
-                  <Link href="/ajukan" className={`${buttonClass("cta")} !py-3 !pl-6`}>
-                    Mulai cari tentor
-                  </Link>
-                  <Link href="/aksesibilitas" className={`${buttonClass("secondary")} !py-3`}>
-                    Butuh mode aksesibilitas
-                  </Link>
-                </div>
+                <Link href="/ajukan" className={`${buttonClass("primary")} group/btn mt-7`}>
+                  Mulai cari tentor
+                  <span aria-hidden className="arrow-nudge">→</span>
+                </Link>
               </Inview>
             </div>
+            <ul className="space-y-3">
+              {trust.map((x, i) => (
+                <Inview as="li" key={x.t} index={i} y={24}>
+                  <div className="flex gap-4 rounded-2xl border border-line bg-card p-5 shadow-[0_18px_36px_-28px_rgba(22,33,30,0.35)]">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent">
+                      <x.icon size={20} aria-hidden />
+                    </span>
+                    <div>
+                      <p className="font-bold text-ink">{x.t}</p>
+                      <p className="mt-1 text-sm leading-relaxed text-muted">{x.d}</p>
+                    </div>
+                  </div>
+                </Inview>
+              ))}
+            </ul>
+          </div>
+        </ScrollPanel>
+      </section>
 
-            <Inview index={1} y={36}>
-              <div className="relative rotate-[1.5deg] rounded-2xl border border-ink/15 bg-card p-6 [background-image:repeating-linear-gradient(transparent,transparent_31px,var(--line)_31px,var(--line)_32px)]">
-                <p className="font-display text-lg font-semibold text-ink">
-                  Cukup tulis{" "}
-                  <StabiloSweep>satu kalimat</StabiloSweep>.
-                </p>
-                <p className="mt-3 text-[15px] leading-8 text-ink">
-                  &ldquo;Anak saya kelas 5, susah fokus saat belajar matematika. Cari tentor sabar yang bisa ke
-                  rumah.&rdquo;
-                </p>
+      {/* ---------- CTA penutup ---------- */}
+      <section className="px-3 pt-6 sm:px-6 sm:pt-8">
+        <ScrollPanel className="tint-block mx-auto max-w-[1240px] rounded-[1.75rem] sm:rounded-[2.25rem]">
+          <div className="mx-auto flex max-w-2xl flex-col items-center px-5 py-16 text-center sm:py-24">
+            <Inview>
+              <Logo />
+            </Inview>
+            <ClipWords
+              text="Temukan tentor pertamamu hari ini."
+              delay={0.15}
+              className="mt-5 text-3xl font-extrabold leading-tight text-ink sm:text-5xl"
+            />
+            <Inview index={2} y={20}>
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+                <Link href="/ajukan" className={`${buttonClass("primary")} group/btn !px-6 !py-3`}>
+                  Mulai cari tentor
+                  <span aria-hidden className="arrow-nudge">→</span>
+                </Link>
+                <Link href="/tentor" className={`${buttonClass("secondary")} !px-6 !py-3`}>
+                  Lihat katalog
+                </Link>
               </div>
             </Inview>
           </div>
-        </Container>
+        </ScrollPanel>
       </section>
     </>
   );
