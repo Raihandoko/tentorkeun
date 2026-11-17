@@ -10,7 +10,7 @@ import {
   useTransform,
   type Transition,
 } from "motion/react";
-import { useEffect, useRef, type ElementType, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ElementType, type ReactNode } from "react";
 import { useA11y } from "@/components/a11y";
 
 /* Preset spring (tension -> stiffness, friction -> damping) */
@@ -321,14 +321,15 @@ export function ParallaxOut({ children, distance = 70, className }: { children: 
 /* Garis tipis di bawah header yang memanjang sesuai seberapa jauh halaman dibaca */
 export function ScrollProgress() {
   const noMotion = useNoMotion();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 180, damping: 30, mass: 0.4 });
-  if (noMotion) return null;
   return (
     <motion.div
       aria-hidden
       className="absolute bottom-0 left-0 h-[2px] w-full origin-left bg-accent"
-      style={{ scaleX }}
+      style={{ scaleX: mounted && noMotion ? scrollYProgress : scaleX }}
     />
   );
 }
