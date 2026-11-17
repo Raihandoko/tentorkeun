@@ -28,58 +28,63 @@ export function SiteNav({ authed, signOut }: { authed: boolean; signOut: ReactNo
   const path = usePathname();
   return (
     <>
-      {/* Desktop */}
-      <nav aria-label="Navigasi utama" className="hidden items-center gap-1 md:flex">
-        {nav.map((n) => {
-          const active = isActive(path, n.href);
-          return (
-            <Link
-              key={n.href}
-              href={n.href}
-              aria-current={active ? "page" : undefined}
-              className="nav-link relative rounded-full px-3 py-2 text-sm font-semibold text-ink/85 hover:text-ink"
-            >
-              {n.label}
-              {active && (
-                <motion.span
-                  layoutId="nav-active"
-                  className="absolute inset-x-3 -bottom-0.5 h-[3px] rounded-full bg-accent"
-                  transition={spring.rise}
-                />
-              )}
-            </Link>
-          );
-        })}
+      {/* Desktop: tautan di tengah, aksi di kanan */}
+      <nav
+        aria-label="Navigasi utama"
+        className="hidden items-center gap-1 md:absolute md:left-1/2 md:flex md:-translate-x-1/2"
+      >
+        {nav
+          .filter((n) => n.href !== "/")
+          .map((n) => {
+            const active = isActive(path, n.href);
+            return (
+              <Link
+                key={n.href}
+                href={n.href}
+                aria-current={active ? "page" : undefined}
+                className={`relative isolate rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
+                  active ? "text-ink" : "text-muted hover:text-ink"
+                }`}
+              >
+                {active && (
+                  <motion.span
+                    layoutId="nav-active"
+                    aria-hidden
+                    className="absolute inset-0 -z-10 rounded-lg bg-ink/[0.06]"
+                    transition={spring.rise}
+                  />
+                )}
+                {n.label}
+              </Link>
+            );
+          })}
         <FiturPopover />
-        <div className="ml-2 flex items-center gap-2">
-          {authed ? (
-            <>
-              <Link
-                href="/dashboard"
-                className="btn-press flex items-center gap-1.5 rounded-full border border-ink/30 px-3 py-2 text-sm font-semibold text-ink hover:border-ink"
-              >
-                <User size={14} aria-hidden /> Dashboard
-              </Link>
-              {signOut}
-            </>
-          ) : (
-            <>
-              <Link
-                href="/auth/login"
-                className="btn-press rounded-full border border-ink/30 px-4 py-2 text-sm font-semibold text-ink hover:border-ink"
-              >
-                Masuk
-              </Link>
-              <Link
-                href="/ajukan"
-                className="btn-press btn-dot rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-accent-ink hover:bg-accent-hover"
-              >
-                Mulai cari
-              </Link>
-            </>
-          )}
-        </div>
       </nav>
+      <div className="hidden items-center gap-2 md:flex">
+        {authed ? (
+          <>
+            <Link
+              href="/dashboard"
+              className="btn-press flex items-center gap-1.5 rounded-xl border border-line-strong/60 px-3.5 py-2 text-sm font-semibold text-ink hover:border-ink"
+            >
+              <User size={14} aria-hidden /> Dashboard
+            </Link>
+            {signOut}
+          </>
+        ) : (
+          <>
+            <Link href="/auth/login" className="rounded-lg px-3 py-2 text-sm font-semibold text-ink hover:bg-ink/5">
+              Masuk
+            </Link>
+            <Link
+              href="/ajukan"
+              className="btn-press rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-accent-ink shadow-[0_8px_18px_-10px_var(--accent)] hover:bg-accent-hover"
+            >
+              Mulai cari
+            </Link>
+          </>
+        )}
+      </div>
 
       <MobileMenu authed={authed} signOut={signOut} />
     </>
@@ -146,7 +151,7 @@ function FiturPopover() {
             requestAnimationFrame(() => wrap.current?.querySelector<HTMLElement>("[role=menuitem]")?.focus());
           }
         }}
-        className="nav-link flex items-center gap-1 rounded-full px-3 py-2 text-sm font-semibold text-ink/85 hover:text-ink"
+        className="flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-semibold text-muted transition-colors hover:text-ink"
       >
         Fitur
         <motion.span animate={{ rotate: open ? 180 : 0 }} transition={spring.hover} className="inline-flex">
@@ -163,15 +168,15 @@ function FiturPopover() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.98 }}
             transition={{ duration: 0.18, ease: easeOutExpo }}
-            style={{ transformOrigin: "top right" }}
-            className="absolute right-0 top-full mt-2 w-72 rounded-xl border border-ink/20 bg-card p-1.5"
+            style={{ transformOrigin: "top center" }}
+            className="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded-2xl border border-line bg-card p-1.5 shadow-[0_24px_48px_-24px_rgba(22,33,30,0.35)]"
           >
             {fitur.map((f) => (
               <Link
                 key={f.href}
                 href={f.href}
                 role="menuitem"
-                className="block rounded-xl px-3 py-2.5 hover:bg-accent-soft focus-visible:bg-accent-soft"
+                className="block rounded-xl px-3 py-2.5 hover:bg-ink/[0.04] focus-visible:bg-ink/[0.04]"
               >
                 <span className="block text-sm font-semibold text-ink">{f.label}</span>
                 <span className="block text-xs text-muted">{f.desc}</span>
@@ -228,7 +233,7 @@ function MobileMenu({ authed, signOut }: { authed: boolean; signOut: ReactNode }
         aria-label="Buka menu"
         aria-expanded={open}
         aria-controls="menu-mobile"
-        className="btn-press flex h-11 w-11 items-center justify-center rounded-full border border-ink/30 text-ink"
+        className="btn-press flex h-11 w-11 items-center justify-center rounded-xl border border-line-strong/60 text-ink"
       >
         <Menu size={20} aria-hidden />
       </button>
@@ -239,20 +244,20 @@ function MobileMenu({ authed, signOut }: { authed: boolean; signOut: ReactNode }
             id="menu-mobile"
             role="dialog"
             aria-label="Menu"
-            className="fixed inset-0 z-50 overflow-y-auto bg-accent text-accent-ink"
+            className="fixed inset-0 z-50 overflow-y-auto bg-paper text-ink"
             initial={{ y: "-100%" }}
             animate={{ y: 0 }}
             exit={{ y: "-100%" }}
             transition={{ duration: 0.5, ease: easeOutExpo }}
           >
-            <div className="flex h-16 items-center justify-between px-5">
-              <span className="font-display text-xl font-bold">TentorKeun</span>
+            <div className="flex h-16 items-center justify-between border-b border-line px-5">
+              <span className="font-display text-xl font-extrabold">Tentor<span className="text-accent">Keun</span></span>
               <button
                 ref={closeBtn}
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label="Tutup menu"
-                className="group/x flex h-11 w-11 items-center justify-center rounded-full border border-accent-ink/50"
+                className="group/x flex h-11 w-11 items-center justify-center rounded-xl border border-line-strong/60"
               >
                 <X size={20} aria-hidden className="transition-transform duration-300 group-hover/x:rotate-90 group-focus-visible/x:rotate-90" />
               </button>
@@ -268,7 +273,7 @@ function MobileMenu({ authed, signOut }: { authed: boolean; signOut: ReactNode }
                   <Link
                     href={l.href}
                     aria-current={isActive(path, l.href) ? "page" : undefined}
-                    className="block border-b border-accent-ink/25 py-3.5 font-display text-2xl font-semibold"
+                    className={`block border-b border-line py-3.5 font-display text-2xl font-bold ${isActive(path, l.href) ? "text-accent" : "text-ink"}`}
                   >
                     {l.label}
                   </Link>
@@ -277,17 +282,17 @@ function MobileMenu({ authed, signOut }: { authed: boolean; signOut: ReactNode }
               <li className="flex flex-wrap items-center gap-3 pt-6">
                 {authed ? (
                   <>
-                    <Link href="/dashboard" className="rounded-full bg-accent-ink px-4 py-2.5 text-sm font-semibold text-accent">
+                    <Link href="/dashboard" className="rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-accent-ink">
                       Dashboard
                     </Link>
                     {signOut}
                   </>
                 ) : (
                   <>
-                    <Link href="/auth/login" className="rounded-full border border-accent-ink px-4 py-2.5 text-sm font-semibold">
+                    <Link href="/auth/login" className="rounded-xl border border-line-strong/60 px-4 py-2.5 text-sm font-semibold text-ink">
                       Masuk
                     </Link>
-                    <Link href="/ajukan" className="rounded-full bg-accent-ink px-4 py-2.5 text-sm font-semibold text-accent">
+                    <Link href="/ajukan" className="rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-accent-ink">
                       Mulai cari
                     </Link>
                   </>

@@ -5,6 +5,9 @@ import {
   motion,
   useInView,
   useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
   type Transition,
 } from "motion/react";
 import { useEffect, useRef, type ElementType, type ReactNode } from "react";
@@ -73,14 +76,15 @@ export function ClipWords({
   /** kata yang diberi sorotan stabilo */
   highlight?: string;
 }) {
-  const Tag = as;
+  const Tag = as as ElementType;
   const words = text.split(" ");
-  const trigger = immediate
-    ? { animate: { y: "0%" } }
-    : { whileInView: { y: "0%" }, viewport: { once: true, margin: "0px 0px -60px 0px" } };
+  // Pantau judulnya sendiri: kata yang masih tersembunyi di balik masker tidak terdeteksi oleh IntersectionObserver
+  const ref = useRef<HTMLElement>(null);
+  const seen = useInView(ref, { once: true, margin: "0px 0px -60px 0px" });
+  const show = immediate || seen;
 
   return (
-    <Tag className={className} aria-label={text}>
+    <Tag ref={ref} className={className} aria-label={text}>
       {words.map((w, i) => (
         <span
           key={i}
@@ -92,7 +96,7 @@ export function ClipWords({
             data-reveal
             className="inline-block"
             initial={{ y: "115%" }}
-            {...trigger}
+            animate={{ y: show ? "0%" : "115%" }}
             transition={{ duration: 0.7, ease: easeOutExpo, delay: delay + i * 0.06 }}
           >
             {highlight && w.replace(/[.,]/g, "") === highlight ? <span className="stabilo">{w}</span> : w}
@@ -248,5 +252,83 @@ export function DotsIndicator({
         </button>
       ))}
     </div>
+  );
+}
+
+/* =====================================================================
+   Transisi yang mengikuti posisi scroll
+   ===================================================================== */
+
+/* Panel besar: "in" = membesar dan menebal saat masuk layar,
+   "out" = mengecil dan memudar pelan saat meninggalkan layar (untuk hero) */
+export function ScrollPanel({
+  children,
+  className,
+  mode = "in",
+}: {
+  children: ReactNode;
+  className?: string;
+  mode?: "in" | "out";
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const noMotion = useNoMotion();
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: mode === "in" ? ["start end", "start 0.55"] : ["start start", "end start"],
+  });
+  const scale = useTransform(scrollYProgress, [0, 1], mode === "in" ? [0.93, 1] : [1, 0.94]);
+  const opacity = useTransform(scrollYProgress, [0, 1], mode === "in" ? [0.4, 1] : [1, 0.5]);
+  const y = useTransform(scrollYProgress, [0, 1], mode === "in" ? [64, 0] : [0, 48]);
+
+  return (
+    <motion.div
+      ref={ref}
+      data-reveal
+      className={className}
+      style={noMotion ? undefined : { scale, opacity, y, transformOrigin: mode === "in" ? "50% 100%" : "50% 0%" }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/* Geser horizontal mengikuti scroll (untuk baris marquee) */
+export function ScrollSlide({ children, from = -60, to = 0 }: { children: ReactNode; from?: number; to?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const noMotion = useNoMotion();
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const x = useTransform(scrollYProgress, [0, 1], [from, to]);
+  return (
+    <div ref={ref}>
+      <motion.div style={noMotion ? undefined : { x }}>{children}</motion.div>
+    </div>
+  );
+}
+
+/* Geser vertikal pelan saat meninggalkan layar (parallax) */
+export function ParallaxOut({ children, distance = 70, className }: { children: ReactNode; distance?: number; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const noMotion = useNoMotion();
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
+  const y = useTransform(scrollYProgress, [0, 1], [0, distance]);
+  return (
+    <motion.div ref={ref} data-reveal className={className} style={noMotion ? undefined : { y }}>
+      {children}
+    </motion.div>
+  );
+}
+
+/* Garis tipis di bawah header yang memanjang sesuai seberapa jauh halaman dibaca */
+export function ScrollProgress() {
+  const noMotion = useNoMotion();
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 180, damping: 30, mass: 0.4 });
+  if (noMotion) return null;
+  return (
+    <motion.div
+      aria-hidden
+      className="absolute bottom-0 left-0 h-[2px] w-full origin-left bg-accent"
+      style={{ scaleX }}
+    />
   );
 }

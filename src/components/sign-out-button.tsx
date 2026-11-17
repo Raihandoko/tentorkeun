@@ -16,7 +16,7 @@ export function SignOutButton() {
   return (
     <button
       onClick={handleSignOut}
-      className="btn-press flex items-center gap-1.5 rounded-md bg-koreksi px-3 py-2 text-sm font-semibold text-koreksi-ink hover:opacity-90"
+      className="btn-press flex items-center gap-1.5 rounded-xl border border-line-strong/60 px-3.5 py-2 text-sm font-semibold text-ink hover:border-koreksi hover:text-koreksi"
     >
       <LogOut size={14} aria-hidden />
       Keluar
