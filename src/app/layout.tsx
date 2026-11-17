@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import Script from "next/script";
 import { Plus_Jakarta_Sans, Atkinson_Hyperlegible_Next } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
@@ -31,14 +30,6 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="id" suppressHydrationWarning className={`${display.variable} ${body.variable} h-full antialiased`}>
-      <head>
-        {/* Failsafe: kalau JS gagal hydrate, semua konten yang menunggu animasi tetap ditampilkan */}
-        <Script id="reveal-failsafe" strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `setTimeout(function(){var d=document.documentElement;if(!d.dataset.hydrated)d.dataset.revealFallback="1"},2500)`,
-          }}
-        />
-      </head>
       <body className="flex min-h-full flex-col">
         <noscript>
           <style>{`[data-reveal]{opacity:1!important;transform:none!important}`}</style>

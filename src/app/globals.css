@@ -273,8 +273,8 @@ html[data-a11y-motion="1"] .marquee-track { animation: none !important; }
 html[data-a11y-contrast="1"] .stabilo { background: var(--stabilo); color: var(--on-stabilo); }
 html[data-a11y-contrast="1"] .sweep-bg { top: 0.05em !important; bottom: 0.05em !important; }
 
-/* Failsafe: kalau JS gagal hydrate, semua konten tetap tampil */
-html[data-reveal-fallback="1"] [data-reveal] {
+/* Tampilkan konten dulu sampai hydration selesai, agar animasi gagal tidak menyembunyikan halaman */
+html:not([data-hydrated]) [data-reveal] {
   opacity: 1 !important;
   transform: none !important;
   filter: none !important;
